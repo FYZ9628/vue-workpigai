@@ -4,7 +4,7 @@
            label-width="0px">
     <h3 class="login_title">系统登录</h3>
     <el-form-item>
-      <el-input type="text" v-model="loginForm.username"
+      <el-input type="text" v-model="loginForm.account"
                 auto-complete="off" placeholder="账号"></el-input>
     </el-form-item>
     <el-form-item>
@@ -25,8 +25,8 @@
     data () {
       return {
         loginForm: {
-          username: 'admin',
-          password: '123'
+          account: '116263000101',
+          password: '123456'
         },
         responseResult: []
       }
@@ -37,7 +37,7 @@
         console.log(this.$store.state)
         this.$axios
           .post('/login', {
-            username: this.loginForm.username,
+            account: this.loginForm.account,
             password: this.loginForm.password
           })
           .then(successResponse => {

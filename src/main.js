@@ -17,7 +17,7 @@ Vue.use(ElementUI)
 // 拦截后重定向
 router.beforeEach((to, from, next) => {
     if (to.meta.requireAuth) {
-      if (store.state.user.username) {
+      if (store.state.user.account) {
         next()
       } else {
         next({
