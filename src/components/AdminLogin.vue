@@ -25,7 +25,7 @@
     data () {
       return {
         loginForm: {
-          account: '116263000101',
+          account: 'T116263000101',
           password: '123456'
         },
         responseResult: []
@@ -41,7 +41,7 @@
             password: this.loginForm.password
           })
           .then(successResponse => {
-            if (successResponse.data.code === 200) {
+            if (successResponse.data.code === 100) {
               // var data = this.loginForm
               _this.$store.commit('login', _this.loginForm)
               var path = this.$route.query.redirect
