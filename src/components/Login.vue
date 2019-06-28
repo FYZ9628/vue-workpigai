@@ -60,10 +60,10 @@
               .then(successResponse => {
                 this.logining = false
                 if (successResponse.data.code === 200) {
-                  // var data = this.loginForm
-                  _this.$store.commit('login', _this.loginForm)
-                  var path = this.$route.query.redirect
-                  this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
+                   var data = this.loginForm
+                   _this.$store.commit('login', _this.loginForm)
+                   var path = this.$route.query.redirect
+                   this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
                 }else {
                   _this.$message({
                     message:'账号或密码错误',

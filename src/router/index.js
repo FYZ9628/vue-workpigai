@@ -3,15 +3,15 @@ import Router from 'vue-router'
 import AppIndex from '@/components/home/AppIndex'
 import Login from '@/components/Login'
 import AdminLogin from '@/components/AdminLogin'
-import AdminIndex from "@/components/admin/AdminIndex";
-import TeacherInfo from "@/components/admin/TeacherInfo";
-import StudentInfo from "@/components/admin/StudentInfo";
-import ClassInfo from "@/components/admin/ClassInfo";
-import Course from "@/components/admin/Course";
+import StudentIndex from "@/components/admin/StudentIndex";
+import TeacherIndex from "@/components/admin/TeacherIndex";
+import AdminHome from "@/components/AdminHome";
+
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/login',
@@ -23,18 +23,33 @@ export default new Router({
       name: 'AdminLogin',
       component: AdminLogin
     },
+
     {
       path: '/admin',
-      component: AdminIndex,
-      name: 'AdminIndex',
-      iconCls: 'el-icon-message',//图标样式class
+      name: 'AdminHome',
+      component: AdminHome,
+      redirect: '/teacherInfo',
       children: [
-        { path: '/main', component: TeacherInfo, name: '教师信息', hidden: true },
-        { path: '/table', component: StudentInfo, name: '学生信息' },
-        { path: '/form', component: ClassInfo, name: '班级信息' },
-        { path: '/user', component: Course, name: '课程安排' },
+
+        {
+          path: '/teacherInfo',
+          name: 'TeacherIndex',
+          component: TeacherIndex,
+          meta: {
+            requireAuth: true
+          }
+        },
+        {
+          path: '/studentInfo',
+          name: 'StudentIndex',
+          component: StudentIndex,
+          meta: {
+            requireAuth: true
+          }
+        }
       ]
     },
+
     {
       path: '/index',
       name: 'AppIndex',
