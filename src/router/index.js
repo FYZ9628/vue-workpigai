@@ -6,7 +6,7 @@ import AdminLogin from '@/components/AdminLogin'
 import StudentIndex from "@/components/admin/StudentIndex";
 import TeacherIndex from "@/components/admin/TeacherIndex";
 import AdminHome from "@/components/AdminHome";
-
+import StudentHome from "@/components/StudentHome";
 
 Vue.use(Router)
 
@@ -49,7 +49,14 @@ export default new Router({
         }
       ]
     },
-
+    {
+      path: '/student',
+      name: 'StudentHome',
+      component: StudentHome,
+      meta: {
+        requireAuth: true
+      }
+    },
     {
       path: '/index',
       name: 'AppIndex',
