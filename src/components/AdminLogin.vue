@@ -25,7 +25,7 @@
     data () {
       return {
         loginForm: {
-          account: 'T116263000101',
+          account: '1001',
           password: '123456'
         },
         responseResult: []
@@ -43,9 +43,9 @@
           .then(successResponse => {
             if (successResponse.data.code === 100) {
               // var data = this.loginForm
-              _this.$store.commit('login', _this.loginForm)
+              _this.$store.commit('admin_login', _this.loginForm)
               var path = this.$route.query.redirect
-              this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
+              this.$router.replace({path: path === '/' || path === undefined ? '/admin' : path})
             }
           })
           .catch(failResponse => {

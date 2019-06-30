@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-// 用于拦截
+// 用于存储登录过的用户的信息
 export default new Vuex.Store({
   state: {
     user: {

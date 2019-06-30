@@ -3,8 +3,19 @@
       <el-container>
         <el-header style="padding-top: 20px;padding-left: 50px;text-align:left;">
         <div >
-          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>
-          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>
+
+          <el-input
+            @keyup.enter.native="searchClick"
+            placeholder="通过书名或作者搜索..."
+            prefix-icon="el-icon-search"
+            size="small"
+            style="width: 400px;margin-right: 10px"
+            v-model="keywords">
+          </el-input>
+          <el-button size="small" type="primary" icon="el-icon-search" @click="searchClick">搜索</el-button>
+
+<!--          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>-->
+<!--          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>-->
           <el-button type="primary" style="background-color: #545c64" @click="handleAdd">新增</el-button>
 
         </div>
@@ -15,7 +26,7 @@
         </el-aside>
         <el-main style="padding-top: 10px;padding-left: 50px">
           <el-table
-            :data="tableData"
+            :data="teachers"
             style="width: 100%"
             height="450">
             <el-table-column
@@ -26,7 +37,7 @@
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="account"
+              prop="user.account"
               label="工号"
               width="200">
             </el-table-column>
@@ -127,55 +138,15 @@
     data() {
       return {
         input: '',
-        tableData: [{
-          id: '1',
-          account:'11223344',
-          name: '王小虎',
-          sex: '男 '
+        teachers: [], //教师信息
+        user:{
+          id: '',
+          account: '',
+          password: '',
+          type: ''
         },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },
-          {
-            id: '3',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },
-          {
-            id: '4',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },
-          {
-            id: '5',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },
-          {
-            id: '6',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },
-          {
-            id: '7',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },
-          {
-            id: '8',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 '
-          },],
-
+        keywords: '',
+        searchResult: [],
 
         editFormVisible: false,//编辑界面是否显示
         editLoading: false,
@@ -189,9 +160,10 @@
         },
         //编辑界面数据
         editForm: {
+          id: '',
           account: '',
           name: '',
-          sex: -1,
+          sex: '',
         },
 
         addFormVisible: false,//新增界面是否显示
@@ -206,27 +178,39 @@
         },
         //新增界面数据
         addForm: {
+          id: '',
           account: '',
           name: '',
-          sex: -1,
+          sex: '',
 
         }
       }
     },
 
+    // mounted，组件挂载后，此方法执行后，页面显示
+    mounted: function () {
+      this.loadTeacherInfo();
+    },
 
     methods: {
-
+      //请求加载教师信息
+      loadTeacherInfo () {
+        let _this = this
+        this.$axios.get('/teacherInfo').then(resp => {
+          if (resp && resp.status === 200) {
+            _this.teachers = resp.data;
+          }
+        })
+      },
 
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
+          id: '100',
+          account: '',
           name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
+          sex: '男',
         };
       },
       //新增
@@ -235,25 +219,60 @@
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              addUser(para).then((res) => {
-                this.addLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['addForm'].resetFields();
-                this.addFormVisible = false;
-                this.getUsers();
-              });
+
+              // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
+              this.user.account = "T116263000203";
+              this.user.password = "123456";
+              this.user.type = 2;
+
+              this.$axios
+                .post('/addTeacher', {
+                  // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
+                  user: this.user,
+                  name: "测试测试",
+                  sex: "男",
+                }).then(resp => {
+                if (resp && resp.status === 200) {
+                  this.addLoading = false;
+                  this.$emit('onSubmit')
+                }
+              })
+
+
             });
           }
         });
       },
-      //获取用户列表,用于显示、搜索
+
+
+      searchClick () {
+        let _this = this;
+        this.$axios
+          .post('/searchTeacher', {
+            keywords: this.keywords
+          }).then(resp => {
+          if (resp && resp.status === 200) {
+
+
+            _this.searchResult = resp.data;
+
+            _this.teachers = _this.searchResult;
+            this.loadTeacherInfo ();
+
+            console.log(resp.data);
+            console.log(_this.searchResult);
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+
+          }
+        })
+
+      },
+
+
       getUsers() {
         let para = {
           page: this.page,

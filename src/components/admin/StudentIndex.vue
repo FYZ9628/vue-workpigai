@@ -15,7 +15,7 @@
       </el-aside>
       <el-main style="padding-top: 10px;padding-left: 50px">
         <el-table
-          :data="tableData"
+          :data="teachers"
           style="width: 100%"
           height="445">
           <el-table-column
