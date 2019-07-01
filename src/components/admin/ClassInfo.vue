@@ -6,7 +6,7 @@
 
           <el-input
             @keyup.enter.native="searchClick"
-            placeholder="通过姓名或ID搜索..."
+            placeholder="通过班级名或ID搜索..."
             prefix-icon="el-icon-search"
             size="medium"
             style="width: 400px;margin-right: 10px"
@@ -27,31 +27,25 @@
         </el-aside>
         <el-main style="padding-top: 10px;padding-left: 50px">
           <el-table
-            :data="teachers"
+            :data="tableData"
             style="width: 100%"
             height="450">
             <el-table-column
               fixed
               prop="id"
               label="序号"
-              width="200" >
+              width="100" >
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="user.account"
-              label="工号"
+              prop="classId"
+              label="班级号"
               width="200">
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="name"
-              label="姓名"
-              width="200">
-            </el-table-column>
-            <el-table-column
-              fit="true"
-              prop="sex"
-              label="性别"
+              prop="className"
+              label="班级名"
               width="200">
             </el-table-column>
             <el-table-column  fixed="right" label="操作" >
@@ -63,7 +57,7 @@
                 <el-button
                   size="small"
                   type="danger"
-                  @click.native="deleteTeacher(scope.$index, scope.row)" :loading="listenLoading">删除</el-button>
+                  @click.native="deleteClass(scope.$index, scope.row)" :loading="listenLoading">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -81,19 +75,13 @@
       </el-container>
 
   <!--新增界面-->
-      <el-dialog title="新增" :visible.sync="addFormVisible" :append-to-body='true'>
+      <el-dialog title="新增班级信息" :visible.sync="addFormVisible" :append-to-body='true'>
         <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-          <el-form-item label="工号" prop="account">
-            <el-input v-model="addForm.account" auto-complete="off"></el-input>
+          <el-form-item label="班级号" prop="classId">
+            <el-input v-model="addForm.classId" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="addForm.name" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-radio-group v-model="addForm.sex">
-              <el-radio class="radio" :label="1">男</el-radio>
-              <el-radio class="radio" :label="0">女</el-radio>
-            </el-radio-group>
+          <el-form-item label="班级名" prop="className">
+            <el-input v-model="addForm.className" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -103,19 +91,13 @@
       </el-dialog>
 
       <!--编辑界面-->
-      <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'>
+      <el-dialog title="编辑班级信息" :visible.sync="editFormVisible" :append-to-body='true'>
         <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-          <el-form-item label="工号"  prop="account">
-            <el-input v-model="editForm.account" auto-complete="off"></el-input>
+          <el-form-item label="班级号" prop="classId">
+            <el-input v-model="addForm.classId" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="editForm.name" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-radio-group v-model="editForm.sex">
-              <el-radio class="radio" :label="1">男</el-radio>
-              <el-radio class="radio" :label="0">女</el-radio>
-            </el-radio-group>
+          <el-form-item label="班级名" prop="className">
+            <el-input v-model="addForm.className" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -133,11 +115,21 @@
 
 
   export default {
-    name: 'TeacherInfo',
+    name: 'ClassInfo',
     components: {
        },
     data() {
       return {
+        tableData: [{
+          id: '1',
+          classId:'20160021',
+          className: '16软件',
+        },
+          {
+            id: '2',
+            classId:'20170021',
+            className: '17软件',
+          },],
         input: '',
         teachers: [], //教师信息
         user:{
@@ -152,36 +144,34 @@
 
         editFormVisible: false,//编辑界面是否显示
         editFormRules: {
-          account: [
-            { required: true, message: '请输入工号', trigger: 'blur' }
+          classId: [
+            { required: true, message: '请输入班级号', trigger: 'blur' }
           ],
-          name: [
-            { required: true, message: '请输入姓名', trigger: 'blur' }
+          className: [
+            { required: true, message: '请输入班级名', trigger: 'blur' }
           ]
         },
         //编辑界面数据
         editForm: {
           id: '',
-          account: '',
-          name: '',
-          sex: '',
+          classId: '',
+          className: '',
         },
 
         addFormVisible: false,//新增界面是否显示
         addFormRules: {
-          account: [
-            { required: true, message: '请输入工号', trigger: 'blur' }
+          classId: [
+            { required: true, message: '请输入班级号', trigger: 'blur' }
           ],
-          name: [
-            { required: true, message: '请输入姓名', trigger: 'blur' }
+          className: [
+            { required: true, message: '请输入班级名', trigger: 'blur' }
           ]
         },
         //新增界面数据
         addForm: {
           id: '',
-          account: '',
-          name: '',
-          sex: '',
+          classId: '',
+          className: '',
 
         }
       }
@@ -318,8 +308,8 @@
         });
       },
 
-      //删除
-      deleteTeacher: function (index, row) {
+      //删除班级
+      deleteClass: function (index, row) {
         this.$confirm('确认删除该记录吗?', '提示', {
           type: 'warning'
         }).then(() => {

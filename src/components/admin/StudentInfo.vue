@@ -158,7 +158,7 @@
 
 
   export default {
-    name: 'StudentIndex',
+    name: 'StudentInfo',
     components: {
     },
     data() {

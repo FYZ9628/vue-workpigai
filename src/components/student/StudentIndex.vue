@@ -153,7 +153,7 @@
 
 
   export default {
-    name: 'TeacherIndex',
+    name: 'StudentIndex',
     components: {
        },
     data() {

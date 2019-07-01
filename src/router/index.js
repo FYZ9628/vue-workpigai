@@ -1,19 +1,24 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import AppIndex from '@/components/home/AppIndex'
 import Login from '@/components/Login'
 import AdminLogin from '@/components/AdminLogin'
 import StudentInfo from "@/components/admin/StudentInfo";
 import TeacherInfo from "@/components/admin/TeacherInfo";
+import ClassInfo from "@/components/admin/ClassInfo";
+import Course from "@/components/admin/Course";
+
 import AdminHome from "@/components/AdminHome";
 import StudentHome from "@/components/StudentHome";
 import TeacherHome from "@/components/TeacherHome";
+
 import TeacherWork from "@/components/teacher/TeacherWork";
 import WorkPublish from "@/components/teacher/WorkPublish";
 import BankManagement from "@/components/teacher/BankManagement";
 import WorkDetailList from "@/components/teacher/WorkDetailList";
 import WorkDetail from "@/components/student/WorkDetail";
+
 import StudentIndex from "@/components/student/StudentIndex";
+
 
 Vue.use(Router)
 
@@ -40,7 +45,7 @@ export default new Router({
 
         {
           path: '/teacherInfo',
-          name: 'TeacherIndex',
+          name: 'TeacherInfo',
           component: TeacherInfo,
           meta: {
             requireAuth: true
@@ -48,8 +53,24 @@ export default new Router({
         },
         {
           path: '/studentInfo',
-          name: 'StudentIndex',
+          name: 'StudentInfo',
           component: StudentInfo,
+          meta: {
+            requireAuth: true
+          }
+        },
+        {
+          path: '/classInfo',
+          name: 'ClassInfo',
+          component: ClassInfo,
+          meta: {
+            requireAuth: true
+          }
+        },
+        {
+          path: '/course',
+          name: 'Course',
+          component: Course,
           meta: {
             requireAuth: true
           }
@@ -121,13 +142,6 @@ export default new Router({
         }
       ]
     },
-    {
-      path: '/index',
-      name: 'AppIndex',
-      component: AppIndex,
-      meta: {
-        requireAuth: true
-      }
-    }
+
   ]
 })
