@@ -17,10 +17,9 @@
 <script>
   import NavMenu from './student/StudentMenu'
   import CommonHeader from './common/CommonHeader'
-  import StudentIndex from './student/StudentIndex'
   export default {
     name: 'StudentHome',
-    components: {CommonHeader,NavMenu,StudentIndex}
+    components: {CommonHeader,NavMenu}
   }
 </script>
 

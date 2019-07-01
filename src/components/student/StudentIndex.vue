@@ -74,7 +74,7 @@
               <template slot-scope="scope">
                 <el-button
                   size="small"
-                  @click="handleWork(scope.$index, scope.row)">作业详情</el-button>
+                  @click="handleDetail(scope.$index, scope.row)">作业详情</el-button>
                 <el-button
                   size="small"
                   type="danger"
@@ -349,6 +349,18 @@
         this.checkForm = Object.assign({}, row);
       },
 
+
+      //点击跳转到显示详情界面，传递参数过去，在详情界面需要接受
+      handleDetail: function (index, row) {
+
+        this.$router.push({
+          path: '/workDetail',
+          // name: 'mallList',
+          query: {
+            data: row
+          }
+        })
+      },
     }
   }
 </script>
