@@ -3,8 +3,20 @@
       <el-container>
         <el-header style="padding-top: 20px;padding-left: 50px;text-align:left;">
         <div >
-          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>
-          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>
+
+          <el-input
+            @keyup.enter.native="searchClick"
+            placeholder="请输入发布教师、作业标题"
+            prefix-icon="el-icon-search"
+            size="small"
+            style="width: 400px;margin-right: 10px"
+            v-model="keywords">
+          </el-input>
+          <el-button size="small" type="primary" icon="el-icon-search" @click="searchClick">搜索</el-button>
+
+<!--          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>-->
+<!--          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>-->
+
         </div>
 
         </el-header>
@@ -20,18 +32,24 @@
               fixed
               prop="id"
               label="序号"
-              width="200" >
+              width="100" >
             </el-table-column>
             <el-table-column
               fit="true"
               prop="name"
               label="发布教师"
-              width="200">
+              width="150">
             </el-table-column>
             <el-table-column
               fit="true"
               prop="workTitle"
               label="作业标题"
+              width="200">
+            </el-table-column>
+            <el-table-column
+              fit="true"
+              prop="startTime"
+              label="发布日期"
               width="200">
             </el-table-column>
             <el-table-column
@@ -44,13 +62,13 @@
               fit="true"
               prop="state"
               label="提交情况"
-              width="200">
+              width="100">
             </el-table-column>
             <el-table-column
               fit="true"
               prop="score"
               label="分数"
-              width="200">
+              width="100">
             </el-table-column>
             <el-table-column  fixed="right" min-width="200" label="操作" >
               <template slot-scope="scope">
@@ -140,10 +158,19 @@
     data() {
       return {
         input: '',
+
+        works: [],
+        keywords: '',
+        searchResult: [],
+        listenLoading: false,
+
+
+
         tableData: [{
           id: '1',
           name: '王小虎',
           workTitle:'操作系统实验1',
+          startTime:'2019-7-5 23:59',
           endTime:'2019-7-5 23:59',
           state:'已提交',
           score: '90 ',
@@ -152,6 +179,7 @@
             id: '1',
             name: '王小虎',
             workTitle:'操作系统实验1',
+            startTime:'2019-7-5 23:59',
             endTime:'2019-7-5 23:59',
             state:'已提交',
             score: '90 ',
@@ -160,6 +188,7 @@
             id: '1',
             name: '王小虎',
             workTitle:'操作系统实验2',
+            startTime:'2019-7-5 23:59',
             endTime:'2019-7-5 23:59',
             state:'已提交',
             score: '90 ',
@@ -168,6 +197,7 @@
             id: '1',
             name: '王小虎',
             workTitle:'安卓实验报告1',
+            startTime:'2019-7-5 23:59',
             endTime:'2019-7-5 23:59',
             state:'未提交',
             score: ' ',
@@ -176,6 +206,7 @@
             id: '1',
             name: '王小虎',
             workTitle:'安卓实验报告2',
+            startTime:'2019-7-5 23:59',
             endTime:'2019-7-5 23:59',
             state:'已提交',
             score: '90 ',
@@ -232,8 +263,54 @@
       }
     },
 
+    // mounted，组件挂载后，此方法执行后，页面显示
+    mounted: function () {
+      this.loadWorkInfo();
+    },
 
     methods: {
+      //请求加载学生信息
+      loadWorkInfo () {
+        let _this = this
+        this.$axios.get('/studentInfo').then(resp => {
+          if (resp && resp.status === 200) {
+            _this.works = resp.data;
+          }
+        })
+      },
+
+      //查询
+      searchClick () {
+        let _this = this;
+        this.$axios
+          .post('/searchStudent', {
+            keywords: this.keywords
+          }).then(resp => {
+          if (resp && resp.status === 200) {
+
+
+            _this.searchResult = resp.data;
+
+            _this.students = _this.searchResult;
+            this.loadStudentInfo();
+
+            console.log(resp.data);
+            console.log(_this.searchResult);
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+
+          }
+        })
+
+      },
+
+
+
+
+
 
       //显示作业详情界面
       handleWork: function (index, row) {
