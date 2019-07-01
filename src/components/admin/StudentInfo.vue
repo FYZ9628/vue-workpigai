@@ -6,17 +6,18 @@
 
           <el-input
             @keyup.enter.native="searchClick"
-            placeholder="通过书名或作者搜索..."
+            placeholder="通过姓名或ID搜索..."
             prefix-icon="el-icon-search"
-            size="small"
+            size="medium"
             style="width: 400px;margin-right: 10px"
             v-model="keywords">
           </el-input>
-          <el-button size="small" type="primary" icon="el-icon-search" @click="searchClick">搜索</el-button>
+          <el-button size="medium" type="primary" icon="el-icon-search" style="background-color: #545c64"
+                     @click="searchClick">搜 索</el-button>
 
 <!--          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>-->
 <!--          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>-->
-          <el-button type="primary" style="background-color: #545c64" @click="handleAdd">新增</el-button>
+          <el-button size="medium" type="primary" style="background-color: #545c64" @click="handleAdd">新 增</el-button>
 
         </div>
 
