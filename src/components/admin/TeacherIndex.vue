@@ -79,28 +79,6 @@
         </el-footer>
       </el-container>
 
-  <!--编辑界面-->
-      <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'>
-        <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-          <el-form-item label="工号"  prop="account">
-            <el-input v-model="editForm.account" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="editForm.name" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-radio-group v-model="editForm.sex">
-              <el-radio class="radio" :label="1">男</el-radio>
-              <el-radio class="radio" :label="0">女</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="editFormVisible = false">取 消</el-button>
-          <el-button type="primary"style="background-color: #545c64" @click.native="editSubmit" :loading="listenLoading">提 交</el-button>
-        </div>
-      </el-dialog>
-
   <!--新增界面-->
       <el-dialog title="新增" :visible.sync="addFormVisible" :append-to-body='true'>
         <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
@@ -123,27 +101,29 @@
         </div>
       </el-dialog>
 
-<!--      &lt;!&ndash;新增界面&ndash;&gt;-->
-<!--      <el-dialog title="新增" :visible.sync="editFormVisible" :append-to-body='true'>-->
-<!--        <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">-->
-<!--          <el-form-item label="工号" prop="account">-->
-<!--            <el-input v-model="editForm.account" auto-complete="off"></el-input>-->
-<!--          </el-form-item>-->
-<!--          <el-form-item label="姓名" prop="name">-->
-<!--            <el-input v-model="editForm.name" auto-complete="off"></el-input>-->
-<!--          </el-form-item>-->
-<!--          <el-form-item label="性别">-->
-<!--            <el-radio-group v-model="editForm.sex">-->
-<!--              <el-radio class="radio" :label="1">男</el-radio>-->
-<!--              <el-radio class="radio" :label="0">女</el-radio>-->
-<!--            </el-radio-group>-->
-<!--          </el-form-item>-->
-<!--        </el-form>-->
-<!--        <div slot="footer" class="dialog-footer">-->
-<!--          <el-button @click="editFormVisible = false">取 消</el-button>-->
-<!--          <el-button type="primary"style="background-color: #545c64" @click.native="editSubmit" :loading="listenLoading">提 交</el-button>-->
-<!--        </div>-->
-<!--      </el-dialog>-->
+      <!--编辑界面-->
+      <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'>
+        <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+          <el-form-item label="工号"  prop="account">
+            <el-input v-model="editForm.account" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="editForm.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-radio-group v-model="editForm.sex">
+              <el-radio class="radio" :label="1">男</el-radio>
+              <el-radio class="radio" :label="0">女</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="editFormVisible = false">取 消</el-button>
+          <el-button type="primary"style="background-color: #545c64" @click.native="editSubmit" :loading="listenLoading">提 交</el-button>
+        </div>
+      </el-dialog>
+
+
     </div>
 </template>
 
@@ -312,14 +292,14 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
 
-              this.user.id = 45;
+              this.user.id = 45;  //要修改的用户编号
               this.user.account = "T116263000288";
               this.user.password = "123456";
               this.user.type = 2;
 
               this.$axios
                 .post('/addTeacher', {
-                  id: 14,
+                  id: 14, //要修改的教师工号
                   user: this.user,
                   name: "编辑测试",
                   sex: "男",
@@ -369,56 +349,6 @@
         })
       },
 
-
-
-
-
-
-
-
-
-      getUsers() {
-        let para = {
-          page: this.page,
-          name: this.filters.name
-        };
-        this.listLoading = true;
-        //NProgress.start();
-        getUserListPage(para).then((res) => {
-          this.total = res.data.total;
-          this.users = res.data.users;
-          this.listLoading = false;
-          //NProgress.done();
-        });
-      },
-
-
-
-
-      // //编辑
-      // editSubmit: function () {
-      //   this.$refs.editForm.validate((valid) => {
-      //     if (valid) {
-      //       this.$confirm('确认提交吗？', '提示', {}).then(() => {
-      //         this.listenLoading = true;
-      //         //NProgress.start();
-      //         let para = Object.assign({}, this.editForm);
-      //         para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-      //         editUser(para).then((res) => {
-      //           this.listenLoading = false;
-      //           //NProgress.done();
-      //           this.$message({
-      //             message: '提交成功',
-      //             type: 'success'
-      //           });
-      //           this.$refs['editForm'].resetFields();
-      //           this.editFormVisible = false;
-      //           this.getUsers();
-      //         });
-      //       });
-      //     }
-      //   });
-      // },
 
 
     }

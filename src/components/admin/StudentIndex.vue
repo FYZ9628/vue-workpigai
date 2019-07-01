@@ -3,8 +3,19 @@
     <el-container>
       <el-header style="padding-top: 20px;padding-left: 50px;text-align:left;">
         <div >
-          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>
-          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>
+
+          <el-input
+            @keyup.enter.native="searchClick"
+            placeholder="通过书名或作者搜索..."
+            prefix-icon="el-icon-search"
+            size="small"
+            style="width: 400px;margin-right: 10px"
+            v-model="keywords">
+          </el-input>
+          <el-button size="small" type="primary" icon="el-icon-search" @click="searchClick">搜索</el-button>
+
+<!--          <el-input style="width: 300px" v-model="input" placeholder="请输入内容"></el-input>-->
+<!--          <el-button type="primary" style="background-color: #545c64" v-on:click="getUsers">查询</el-button>-->
           <el-button type="primary" style="background-color: #545c64" @click="handleAdd">新增</el-button>
 
         </div>
@@ -15,7 +26,7 @@
       </el-aside>
       <el-main style="padding-top: 10px;padding-left: 50px">
         <el-table
-          :data="teachers"
+          :data="students"
           style="width: 100%"
           height="445">
           <el-table-column
@@ -26,7 +37,7 @@
           </el-table-column>
           <el-table-column
             fit="true"
-            prop="account"
+            prop="user.account"
             label="学号"
             width="150">
           </el-table-column>
@@ -44,7 +55,7 @@
           </el-table-column>
           <el-table-column
             fit="true"
-            prop="className"
+            prop="mClass.className"
             label="班级"
             width="150">
           </el-table-column>
@@ -57,7 +68,7 @@
               <el-button
                 size="small"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                @click="deleteStudent(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -72,37 +83,6 @@
       </el-footer>
     </el-container>
 
-    <!--编辑界面-->
-    <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'>
-      <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="addForm">
-        <el-form-item label="学号" prop="account">
-          <el-input v-model="addForm.account" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="addForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-radio-group v-model="addForm.sex">
-            <el-radio class="radio" :label="1">男</el-radio>
-            <el-radio class="radio" :label="0">女</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="班级" prop="className">
-          <el-select v-model="value" placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="editFormVisible = false">取 消</el-button>
-        <el-button type="primary"style="background-color: #545c64" @click.native="editSubmit" :loading="editLoading">提 交</el-button>
-      </div>
-    </el-dialog>
 
     <!--新增界面-->
     <el-dialog title="新增" :visible.sync="addFormVisible" :append-to-body='true'>
@@ -132,9 +112,44 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addFormVisible = false">取 消</el-button>
-        <el-button type="primary"style="background-color: #545c64" @click.native="addSubmit" :loading="addLoading">提 交</el-button>
+        <el-button type="primary"style="background-color: #545c64" @click.native="addSubmit" :loading="listenLoading">提 交</el-button>
       </div>
     </el-dialog>
+
+
+    <!--编辑界面-->
+    <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'>
+      <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+        <el-form-item label="学号" prop="account">
+          <el-input v-model="editForm.account" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="editForm.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-radio-group v-model="editForm.sex">
+            <el-radio class="radio" :label="1">男</el-radio>
+            <el-radio class="radio" :label="0">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="班级" prop="className">
+          <el-select v-model="value" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editFormVisible = false">取 消</el-button>
+        <el-button type="primary"style="background-color: #545c64" @click.native="editSubmit" :loading="listenLoading">提 交</el-button>
+      </div>
+    </el-dialog>
+
+
   </div>
 </template>
 
@@ -148,55 +163,22 @@
     data() {
       return {
         input: '',
-        tableData: [{
-          id: '1',
-          account:'11223344',
-          name: '王小虎',
-          sex: '男 ',
-          className:"16软件"
+        students: [],
+        user:{
+          id: '',
+          account: '',
+          password: '',
+          type: ''
         },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 ',
-            className:"16软件"
-          },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 ',
-            className:"16软件"
-          },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 ',
-            className:"16软件"
-          },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 ',
-            className:"16软件"
-          },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 ',
-            className:"16软件"
-          },
-          {
-            id: '2',
-            account:'11223344',
-            name: '王小虎',
-            sex: '男 ',
-            className:"16软件"
-          },],
+        mClass:{
+          id: '',
+          classId: '',
+          className: ''
+        },
+        keywords: '',
+        searchResult: [],
+        listenLoading: false,
+
 
 
         editFormVisible: false,//编辑界面是否显示
@@ -248,18 +230,66 @@
     }],
     value: '',
 
+    // mounted，组件挂载后，此方法执行后，页面显示
+    mounted: function () {
+      this.loadStudentInfo();
+      // this.editSubmit();
+    },
+
     methods: {
+
+      //请求加载学生信息
+      loadStudentInfo () {
+        let _this = this
+        this.$axios.get('/studentInfo').then(resp => {
+          if (resp && resp.status === 200) {
+            _this.students = resp.data;
+          }
+        })
+      },
+
+      //查询
+      searchClick () {
+        let _this = this;
+        this.$axios
+          .post('/searchStudent', {
+            keywords: this.keywords
+          }).then(resp => {
+          if (resp && resp.status === 200) {
+
+
+            _this.searchResult = resp.data;
+
+            _this.students = _this.searchResult;
+            this.loadStudentInfo();
+
+            console.log(resp.data);
+            console.log(_this.searchResult);
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+            console.log("搜索测试");
+
+          }
+        })
+
+      },
+
+
+
+
 
 
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
+          id: '100',
+          account: '',
           name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
+          sex: '男',
+          className: ''
         };
       },
       //新增
@@ -267,93 +297,119 @@
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
-              this.addLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              addUser(para).then((res) => {
-                this.addLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['addForm'].resetFields();
-                this.addFormVisible = false;
-                this.getUsers();
-              });
+              this.listenLoading = true;
+
+              // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
+              this.user.account = "116263000300";
+              this.user.password = "123456";
+              this.user.type = 3;
+
+              this.mClass.classId =  2016,
+
+              this.$axios
+                .post('/addStudent', {
+                  // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
+                  user: this.user,
+                  name: "添加学生测试22",
+                  sex: "男",
+                  mClass: this.mClass
+                }).then(resp => {
+                if (resp && resp.status === 200) {
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                  this.$emit('onSubmit')
+                }
+              })
+
+
             });
           }
         });
       },
-      //获取用户列表,用于显示、搜索
-      getUsers() {
-        let para = {
-          page: this.page,
-          name: this.filters.name
-        };
-        this.listLoading = true;
-        //NProgress.start();
-        getUserListPage(para).then((res) => {
-          this.total = res.data.total;
-          this.users = res.data.users;
-          this.listLoading = false;
-          //NProgress.done();
-        });
-      },
+
 
 
       //显示编辑界面
-      handleEdit: function (index, row) {
+      handleEdit: function (index,row) {
         this.editFormVisible = true;
-        this.editForm = Object.assign({}, row);
+        //this.editForm = Object.assign({}, row);
+        this.editForm = {
+          id: '100',
+          account: '',
+          name: '',
+          sex: '男',
+        };
       },
-
       //编辑
       editSubmit: function () {
         this.$refs.editForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
-              this.editLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              editUser(para).then((res) => {
-                this.editLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['editForm'].resetFields();
-                this.editFormVisible = false;
-                this.getUsers();
-              });
+              this.listenLoading = true;
+
+              this.user.id = 50;  //要修改的用户编号
+              this.user.account = "116263000301";
+              this.user.password = "123456";
+              this.user.type = 3;
+
+              this.mClass.classId =  2016,
+
+                this.$axios
+                  .post('/addStudent', {
+                    id: 12, //要修改的学号
+                    user: this.user,
+                    name: "修改学生",
+                    sex: "男",
+                    mClass: this.mClass
+                  }).then(resp => {
+                  if (resp && resp.status === 200) {
+                    this.listenLoading = false;
+                    this.editFormVisible = false;
+                    this.$emit('onSubmit')
+                  }
+                })
+
+
             });
           }
         });
       },
+
+
       //删除
-      handleDelete: function (index, row) {
+      deleteStudent: function (index, row) {
         this.$confirm('确认删除该记录吗?', '提示', {
           type: 'warning'
         }).then(() => {
-          this.listLoading = true;
-          //NProgress.start();
-          let para = { id: row.id };
-          removeUser(para).then((res) => {
-            this.listLoading = false;
-            //NProgress.done();
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            });
-            this.getUsers();
-          });
-        }).catch(() => {
+            this.listenLoading = true;
+            this.$axios     //{id: row.id}
+              .post('/deleteStudent', {id: 12}).then(resp => {
+              if (resp && resp.data.code === 100) {
+                this.listenLoading = false;
+                this.$message({
+                  message: '删除成功',
+                  type: 'success'
+                });
+                this.loadTeacherInfo()
+              }else {
+                this.$message({
+                  message: '删除失败',
+                  type: 'failure'
+                });
+                this.listenLoading = false;
+              }
+            })
+          }
+        ).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      }
 
-        });
-      },
+
+
     }
   }
 </script>
