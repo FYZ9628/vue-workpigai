@@ -81,7 +81,8 @@
       </el-container>
 
   <!--新增界面-->
-      <el-dialog title="新增" :visible.sync="addFormVisible" :append-to-body='true'>
+      <el-dialog title="新增" :visible.sync="addFormVisible" :append-to-body='true'
+                 @close="resetForm('addForm')">
         <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
           <el-form-item label="工号" prop="account">
             <el-input v-model="addForm.account" auto-complete="off"></el-input>
@@ -107,13 +108,16 @@
       </el-dialog>
 
       <!--编辑界面-->
-      <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'>
+      <el-dialog title="编辑" :visible.sync="editFormVisible" :append-to-body='true'
+                 @close="resetForm('editForm')">
         <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
           <el-form-item label="工号"  prop="account">
-            <el-input v-model="editForm.account" auto-complete="off"></el-input>
+            <el-input v-model="editForm.account" auto-complete="off"
+                      ></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="editForm.password" auto-complete="off"></el-input>
+            <el-input v-model="editForm.password" auto-complete="off"
+                      ></el-input>
           </el-form-item>
           <el-form-item label="姓名" prop="name">
             <el-input v-model="editForm.name" auto-complete="off"></el-input>
@@ -165,7 +169,7 @@
             { required: true, message: '请输入工号', trigger: 'blur' }
           ],
           password: [
-            { required: true, message: '请输入工号', trigger: 'blur' }
+            { required: true, message: '请输入密码', trigger: 'blur' }
           ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
@@ -173,9 +177,7 @@
         },
         //编辑界面数据
         editForm: {
-          id: '',
-          account: '',
-          password: '',
+          user:'',
           name: '',
           sex: '',
         },
@@ -210,6 +212,10 @@
     },
 
     methods: {
+    // 关闭dialog时清数据
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
       //请求加载教师信息
       loadTeacherInfo () {
         let _this = this
@@ -353,18 +359,25 @@
       //显示编辑界面
       handleEdit: function (index,row) {
         this.editFormVisible = true;
-        this.editForm = Object.assign({}, row);
-
-        for (let i = 0; i < this.teachers.length; i++) {
-          if (this.teachers[i].id == this.editForm.id) {
-            this.editForm.account = this.teachers[i].user.account;
-            this.editForm.password = this.teachers[i].user.password;
-            this.editForm.name = this.teachers[i].name;
-            this.user.id = this.teachers[i].user.id;
-            // this.editForm.teacherId = this.teachers[i].id;
-
-          }
-        }
+        // this.editForm = Object.assign({}, row);
+        this.editForm = {
+          id: '',
+          teacherId:row.teacherId,
+          account: row.user.account,
+          password:row.user.password,
+          name: row.name,
+          sex: row.sex,
+        };
+        // for (let i = 0; i < this.teachers.length; i++) {
+        //   if (this.teachers[i].id == this.editForm.id) {
+        //     this.editForm.account = this.teachers[i].user.account;
+        //     this.editForm.password = this.teachers[i].user.password;
+        //     this.editForm.name = this.teachers[i].name;
+        //     this.user.id = this.teachers[i].user.id;
+        //     // this.editForm.teacherId = this.teachers[i].id;
+        //
+        //   }
+        // }
         if (this.editForm.sex == '男') {
           this.radios =1;
         }
@@ -380,7 +393,7 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
 
-              // this.user.id = this.editForm.id;  //要修改的用户编号
+              this.user.id = this.editForm.id;  //要修改的用户编号
               this.user.account = this.editForm.account;
               this.user.password = this.editForm.password;
               this.user.type = 2;
@@ -393,12 +406,21 @@
                   sex: this.editForm.sex,
                 }).then(resp => {
                 if (resp && resp.status === 200) {
-                  this.editFormVisible = false;
-                  this.listenLoading = false;
+                  if (resp.data == ''){
+                    this.$message({
+                      message: '添加失败',
+                      type: 'failure'
+                    });
+                    this.listenLoading = false;
+                    this.addFormVisible = false;
+                  }
+                  if (resp && resp.status === 200) {
+                    this.listenLoading = false;
+                    this.addFormVisible = false;
+                    this.loadTeacherInfo();
+                    this.$emit('onSubmit')
+                  }
 
-                  this.loadTeacherInfo();
-
-                  this.$emit('onSubmit')
                 }
               })
 
