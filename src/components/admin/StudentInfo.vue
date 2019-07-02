@@ -315,13 +315,23 @@
                   sex: "男",
                   mClass: this.mClass
                 }).then(resp => {
+
+                if (resp.data == ''){
+                  this.$message({
+                    message: '添加失败',
+                    type: 'failure'
+                  });
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                }
                 if (resp && resp.status === 200) {
                   this.listenLoading = false;
                   this.addFormVisible = false;
+                  this.loadTeacherInfo();
                   this.$emit('onSubmit')
                 }
-              })
 
+              })
 
             });
           }
