@@ -34,7 +34,7 @@
               fixed
               prop="id"
               label="序号"
-              width="200" >
+              width="200">
             </el-table-column>
             <el-table-column
               fit="true"
@@ -86,11 +86,14 @@
           <el-form-item label="工号" prop="account">
             <el-input v-model="addForm.account" auto-complete="off"></el-input>
           </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="addForm.password" auto-complete="off"></el-input>
+          </el-form-item>
           <el-form-item label="姓名" prop="name">
             <el-input v-model="addForm.name" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="性别">
-            <el-radio-group v-model="addForm.sex">
+            <el-radio-group v-model="radios" @change="addFormChangeSex">
               <el-radio class="radio" :label="1">男</el-radio>
               <el-radio class="radio" :label="0">女</el-radio>
             </el-radio-group>
@@ -100,6 +103,7 @@
           <el-button @click="addFormVisible = false">取 消</el-button>
           <el-button type="primary"style="background-color: #545c64" @click.native="addSubmit" :loading="listenLoading">提 交</el-button>
         </div>
+
       </el-dialog>
 
       <!--编辑界面-->
@@ -108,11 +112,14 @@
           <el-form-item label="工号"  prop="account">
             <el-input v-model="editForm.account" auto-complete="off"></el-input>
           </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="editForm.password" auto-complete="off"></el-input>
+          </el-form-item>
           <el-form-item label="姓名" prop="name">
             <el-input v-model="editForm.name" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="性别">
-            <el-radio-group v-model="editForm.sex">
+            <el-radio-group v-model="radios" @change="editFormChangeSex">
               <el-radio class="radio" :label="1">男</el-radio>
               <el-radio class="radio" :label="0">女</el-radio>
             </el-radio-group>
@@ -140,7 +147,9 @@
       return {
         input: '',
         teachers: [], //教师信息
-        user:{
+        // teachersTempList: [], //临时数据
+        // teachersTempList2: [], //临时数据
+        user: {
           id: '',
           account: '',
           password: '',
@@ -155,6 +164,9 @@
           account: [
             { required: true, message: '请输入工号', trigger: 'blur' }
           ],
+          password: [
+            { required: true, message: '请输入工号', trigger: 'blur' }
+          ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
           ]
@@ -163,6 +175,7 @@
         editForm: {
           id: '',
           account: '',
+          password: '',
           name: '',
           sex: '',
         },
@@ -172,6 +185,9 @@
           account: [
             { required: true, message: '请输入工号', trigger: 'blur' }
           ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' }
+          ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
           ]
@@ -180,17 +196,17 @@
         addForm: {
           id: '',
           account: '',
+          password: '',
           name: '',
           sex: '',
-
-        }
+        },
+        radios: 1 //默认性别为 男
       }
     },
 
     // mounted，组件挂载后，此方法执行后，页面显示
     mounted: function () {
       this.loadTeacherInfo();
-      this.editSubmit();
     },
 
     methods: {
@@ -200,9 +216,50 @@
         this.$axios.get('/teacherInfo').then(resp => {
           if (resp && resp.status === 200) {
             _this.teachers = resp.data;
+
+            // for (let i = 0; i < _this.teachers.length; i++) {
+            //   let teacherTemp = {
+            //     id: '',
+            //     account: '',
+            //     name: '',
+            //     sex: ''
+            //   };
+            //   teacherTemp.id = i+1;
+            //   teacherTemp.account = _this.teachers[i].user.account;
+            //   teacherTemp.name = _this.teachers[i].name;
+            //   teacherTemp.sex = _this.teachers[i].sex;
+            //
+            //   this.teachersTempList.push(teacherTemp);
+            // }
+            //
+            // this.teachersTempList2 = this.teachersTempList;
+            //
+            // this.teachersTempList.clean();
+
           }
         })
       },
+
+      // transform2() {
+      //   // this.teachersTempList.clear();
+      //   for (let i = 0; i < this.teachers.length; i++) {
+      //     let teacherTemp = {
+      //         id: '',
+      //         account: '',
+      //         name: '',
+      //         sex: ''
+      //     };
+      //     teacherTemp.id = i+1;
+      //     teacherTemp.account = this.teachers[i].user.account;
+      //     teacherTemp.name = this.teachers[i].name;
+      //     teacherTemp.sex = this.teachers[i].sex;
+      //
+      //
+      //     this.teachersTempList.push(teacherTemp);
+      //   }
+      //
+      // },
+
 
       //查询
       searchClick () {
@@ -212,21 +269,8 @@
             keywords: this.keywords
           }).then(resp => {
           if (resp && resp.status === 200) {
-
-
             _this.searchResult = resp.data;
-
             _this.teachers = _this.searchResult;
-            this.loadTeacherInfo ();
-
-            console.log(resp.data);
-            console.log(_this.searchResult);
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-
           }
         })
 
@@ -238,6 +282,7 @@
         this.addFormVisible = true;
         this.addForm = {
           id: '100',
+          teacherId: '',
           account: '',
           name: '',
           sex: '男',
@@ -251,20 +296,21 @@
               this.listenLoading = true;
 
               // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
-              this.user.account = "T116263000203";
-              this.user.password = "123456";
+              this.user.account = this.addForm.account;
+              this.user.password = this.addForm.password;
               this.user.type = 2;
 
               this.$axios
                 .post('/addTeacher', {
                   // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
                   user: this.user,
-                  name: "编辑测试",
-                  sex: "男",
+                  name: this.addForm.name,
+                  sex: this.addForm.sex,
                 }).then(resp => {
                 if (resp && resp.status === 200) {
                   this.listenLoading = false;
                   this.addFormVisible = false;
+                  this.loadTeacherInfo();
                   this.$emit('onSubmit')
                 }
               })
@@ -275,16 +321,48 @@
         });
       },
 
+      //添加用户性别选择单选按钮
+      addFormChangeSex(value) {
+        if (value == 1){
+          this.addForm.sex = '男'
+        }
+        if (value == 0) {
+          this.addForm.sex = '女'
+        }
+      },
+
+      //编辑用户性别选择单选按钮
+      editFormChangeSex(value) {
+        if (value == 1){
+          this.editForm.sex = '男'
+        }
+        if (value == 0) {
+          this.editForm.sex = '女'
+        }
+      },
+
       //显示编辑界面
       handleEdit: function (index,row) {
         this.editFormVisible = true;
-        //this.editForm = Object.assign({}, row);
-        this.editForm = {
-          id: '100',
-          account: '',
-          name: '',
-          sex: '男',
-        };
+        this.editForm = Object.assign({}, row);
+
+        for (let i = 0; i < this.teachers.length; i++) {
+          if (this.teachers[i].id == this.editForm.id) {
+            this.editForm.account = this.teachers[i].user.account;
+            this.editForm.password = this.teachers[i].user.password;
+            this.editForm.name = this.teachers[i].name;
+            this.user.id = this.teachers[i].user.id;
+            // this.editForm.teacherId = this.teachers[i].id;
+
+          }
+        }
+        if (this.editForm.sex == '男') {
+          this.radios =1;
+        }
+        if (this.editForm.sex == '女') {
+          this.radios =0;
+        }
+
       },
       //编辑
       editSubmit: function () {
@@ -293,21 +371,24 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
 
-              this.user.id = 45;  //要修改的用户编号
-              this.user.account = "T116263000288";
-              this.user.password = "123456";
+              // this.user.id = this.editForm.id;  //要修改的用户编号
+              this.user.account = this.editForm.account;
+              this.user.password = this.editForm.password;
               this.user.type = 2;
 
               this.$axios
                 .post('/addTeacher', {
-                  id: 14, //要修改的教师工号
+                  id: this.editForm.id, //要修改的教师工号
                   user: this.user,
-                  name: "编辑测试",
-                  sex: "男",
+                  name: this.editForm.name,
+                  sex: this.editForm.sex,
                 }).then(resp => {
                 if (resp && resp.status === 200) {
                   this.editFormVisible = false;
                   this.listenLoading = false;
+
+                  this.loadTeacherInfo();
+
                   this.$emit('onSubmit')
                 }
               })
@@ -325,7 +406,7 @@
         }).then(() => {
             this.listenLoading = true;
             this.$axios     //{id: row.id}
-              .post('/deleteTeacher', {id: 18}).then(resp => {
+              .post('/deleteTeacher', {id: row.id}).then(resp => {
               if (resp && resp.data.code === 100) {
                 this.listenLoading = false;
                 this.$message({

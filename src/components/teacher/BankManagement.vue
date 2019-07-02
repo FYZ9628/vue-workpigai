@@ -166,7 +166,7 @@
           {
             id: '4',
             questionId:'11223344',
-            title: '网络编程例题1',
+            title: '测试测试',
           },
 
         ],
@@ -262,6 +262,10 @@
       handleEdit: function (index, row) {
         this.editFormVisible = true;
         this.editForm = Object.assign({}, row);
+
+        console.log("编辑测试："+index);
+        console.log("编辑测试："+this.editForm.account);
+
       },
 
       //编辑

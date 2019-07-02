@@ -5,22 +5,28 @@
     </a>
     <span style="font-size: 32px;font-weight: bold;position:absolute;left: 100px">作业批改系统</span>
 
-    <div style="float: right;padding-right: 10px">
-      <el-dropdown  show-timeout="10" hide-timeout="50">
-        <span class="el-dropdown-link" style="margin-right: 20px">
-        管理员<i class="el-icon-arrow-down el-icon--right"></i>
+
+
+    <el-dropdown  show-timeout="10" hide-timeout="50" style="float: right;padding-right: 10px">
+      <div class="el-dropdown-link" >
+        <span >
+          管理员
         </span>
+        <span style="float: right;margin-left: 10px">
+          <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" size="80"></el-avatar>
+        </span>
+
         <el-dropdown-menu slot="dropdown" >
           <el-dropdown-item divided="true">修改密码</el-dropdown-item>
           <el-dropdown-item divided="true">退出登录</el-dropdown-item>
-<!--          <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>-->
+          <!--          <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>-->
         </el-dropdown-menu>
-        <span style="float: right;padding-right: 10px">
-        <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" size="80"></el-avatar>
-      </span>
-      </el-dropdown>
 
-    </div>
+        <i class="el-icon-arrow-down el-icon--right"></i>
+      </div>
+    </el-dropdown>
+
+
 
   </el-card>
 </template>

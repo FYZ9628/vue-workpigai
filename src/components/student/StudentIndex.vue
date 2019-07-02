@@ -26,7 +26,7 @@
         </el-aside>
         <el-main style="padding-top: 10px;padding-left: 50px">
           <el-table
-            :data="tableData"
+            :data="works"
             style="width: 100%"
             height="450">
             <el-table-column
@@ -37,13 +37,13 @@
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="name"
+              prop="teacher.name"
               label="发布教师"
               width="150">
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="workTitle"
+              prop="workDetail.workTitle"
               label="作业标题"
               width="200">
             </el-table-column>
@@ -273,7 +273,7 @@
       //请求加载学生信息
       loadWorkInfo () {
         let _this = this
-        this.$axios.get('/studentInfo').then(resp => {
+        this.$axios.get('/workInfo').then(resp => {
           if (resp && resp.status === 200) {
             _this.works = resp.data;
           }
