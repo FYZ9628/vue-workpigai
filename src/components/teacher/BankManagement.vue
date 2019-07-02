@@ -88,7 +88,6 @@
             type="textarea"
             v-model="editForm.detail"
             auto-complete="off"
-            :readonly="true"
             :autosize="{ minRows: 8,maxRows:10}"></el-input>
         </el-form-item>
         <el-form-item label="答案">
