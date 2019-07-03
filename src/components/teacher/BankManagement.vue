@@ -5,7 +5,7 @@
         <div >
           <el-input
             @keyup.enter.native="searchClick"
-            placeholder="通过姓名或ID搜索..."
+            placeholder="通过标题或ID搜索..."
             prefix-icon="el-icon-search"
             size="medium"
             style="width: 400px;margin-right: 10px"
@@ -26,7 +26,7 @@
       </el-aside>
       <el-main style="padding-top: 10px;padding-left: 50px">
         <el-table
-          :data="tableData"
+          :data="banks"
           style="width: 100%"
           height="450">
           <el-table-column
@@ -57,7 +57,7 @@
               <el-button
                 size="small"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                @click="deleteQuestion(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -74,9 +74,9 @@
       </el-footer>
     </el-container>
 
-    <!--题目详情界面-->
+    <!--题目编辑界面-->
     <el-dialog title="编辑题目" :visible.sync="editFormVisible" :append-to-body='true'>
-      <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="detailForm">
+      <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
         <el-form-item label="题号" prop="questionId">
           <el-input v-model="editForm.questionId" auto-complete="off"readonly="true"></el-input>
         </el-form-item>
@@ -86,7 +86,7 @@
         <el-form-item label="题目内容" >
           <el-input
             type="textarea"
-            v-model="editForm.detail"
+            v-model="editForm.content"
             auto-complete="off"
             :autosize="{ minRows: 8,maxRows:10}"></el-input>
         </el-form-item>
@@ -99,8 +99,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="detailFormVisible = false">取 消</el-button>
-        <el-button type="primary"style="background-color: #545c64" @click.native="detailSubmit" :loading="detailLoading">保存</el-button>
+        <el-button @click="editFormVisible = false">取 消</el-button>
+        <el-button type="primary"style="background-color: #545c64" @click.native="editSubmit" :loading="listenLoading">保存</el-button>
       </div>
     </el-dialog>
 
@@ -123,14 +123,14 @@
         <el-form-item label="答案">
           <el-input
             type="textarea"
-            v-model="addForm.detail"
+            v-model="addForm.answer"
             auto-complete="off"
             :autosize="{ minRows: 8,maxRows:10}"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addFormVisible = false">取 消</el-button>
-        <el-button type="primary"style="background-color: #545c64" @click.native="addSubmit" :loading="addLoading">提 交</el-button>
+        <el-button type="primary"style="background-color: #545c64" @click.native="addSubmit" :loading="listenLoading">提 交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -142,76 +142,80 @@
 
   export default {
     name: 'BankManagement',
-    components: {
-    },
+
     data() {
       return {
         input: '',
-        tableData: [{
-          id: '1',
-          questionId:'11223344',
-          title: '操作系统例题1',
-        },
-          {
-            id: '2',
-            questionId:'11223344',
-            title: '信息安全例题1',
-          },
-          {
-            id: '3',
-            questionId:'11223344',
-            title: '项目管理例题1',
-          },
-          {
-            id: '4',
-            questionId:'11223344',
-            title: '测试测试',
-          },
-
-        ],
+        banks:'',
 
 
         editFormVisible: false,//编辑界面是否显示
-        editLoading: false,
+
         editFormRules: {
         },
         //编辑界面数据
         editForm: {
+          id:'',
           questionId: '',
           title: '',
-          detail: '',
+          content: '',
           answer: '',
         },
 
         addFormVisible: false,//新增界面是否显示
-        addLoading: false,
+
         addFormRules: {
         },
         //新增界面数据
         addForm: {
           questionId: '',
           title: '',
-          detail: '',
+          content: '',
           answer: '',
         },
 
         keywords: '',
+        listenLoading: false,
       }
     },
 
-
+    // mounted，组件挂载后，此方法执行后，页面显示
+    mounted: function () {
+      this.loadBankInfo();
+    },
     methods: {
 
+      //请求加载题库信息
+      loadBankInfo () {
+        let _this = this
+        this.$axios.get('/questionBankInfo').then(resp => {
+          if (resp && resp.status === 200) {
+            _this.banks = resp.data;
+          }
+        })
+      },
+      //查询
+      searchClick () {
+        let _this = this;
+        this.$axios
+          .post('/searchQuestionBank', {
+            keywords: this.keywords
+          }).then(resp => {
+          if (resp && resp.status === 200) {
+            _this.searchResult = resp.data;
+            _this.banks = _this.searchResult;
+          }
+        })
 
+      },
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
+          questionId: '',
+          title: '',
+          content: '',
+          answer: '',
         };
       },
 
@@ -220,97 +224,132 @@
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
-              this.addLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              addUser(para).then((res) => {
-                this.addLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['addForm'].resetFields();
-                this.addFormVisible = false;
-                this.getUsers();
-              });
+              this.listenLoading = true;
+
+              // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
+
+              this.$axios
+                .post('/addQuestionBank', {
+                  // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
+                  questionId: this.addForm.questionId,
+                  title: this.addForm.title,
+                  content: this.addForm.content,
+                  answer: this.addForm.answer,
+                }).then(resp => {
+
+                if (resp.data == ''){
+                  this.$message({
+                    message: '添加失败',
+                    type: 'failure'
+                  });
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                }
+                if (resp && resp.status === 200) {
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                  this.$message({
+                    message: '添加成功',
+                    type: 'success'
+                  });
+                  this.loadBankInfo();
+                  this.$emit('onSubmit')
+                }
+
+              })
+
             });
           }
         });
       },
 
-      //获取用户列表,用于显示、搜索
-      getUsers() {
-        let para = {
-          page: this.page,
-          name: this.filters.name
-        };
-        this.listLoading = true;
-        //NProgress.start();
-        getUserListPage(para).then((res) => {
-          this.total = res.data.total;
-          this.users = res.data.users;
-          this.listLoading = false;
-          //NProgress.done();
-        });
-      },
 
 
       //显示编辑界面
       handleEdit: function (index, row) {
         this.editFormVisible = true;
-        this.editForm = Object.assign({}, row);
-
-        console.log("编辑测试："+index);
-        console.log("编辑测试："+this.editForm.account);
-
+        //this.editForm = Object.assign({}, row);
+        this.editForm = {
+          id:row.id,
+          questionId: row.questionId,
+          title: row.title,
+          content: row.content,
+          answer: row.answer,
+        };
       },
 
       //编辑
-      detailSubmit: function () {
+      editSubmit: function () {
         this.$refs.editForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
-              this.editLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              editUser(para).then((res) => {
-                this.editLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['editForm'].resetFields();
-                this.editFormVisible = false;
-                this.getUsers();
-              });
+              this.listenLoading = true;
+
+
+              this.$axios
+                .post('/updateQuestionBank', {
+
+                  id:this.editForm.id,//要修改的题目ID
+                  questionId: this.editForm.questionId,
+                  title: this.editForm.title,
+                  content: this.editForm.content,
+                  answer: this.editForm.answer,
+                }).then(resp => {
+                if (resp && resp.status === 200) {
+                  if (resp.data == ''){
+                    this.$message({
+                      message: '修改失败',
+                      type: 'failure'
+                    });
+                    this.listenLoading = false;
+                    this.addFormVisible = false;
+                  }
+                  if (resp && resp.status === 200) {
+                    // if (resp.data!=null) {
+                    this.listenLoading = false;
+                    this.editFormVisible = false;
+                    this.loadBankInfo();
+                    this.$emit('onSubmit')
+                  }
+
+                }
+              })
+
+
             });
           }
         });
       },
       //删除
-      handleDelete: function (index, row) {
+      deleteQuestion: function (index, row) {
         this.$confirm('确认删除该记录吗?', '提示', {
           type: 'warning'
         }).then(() => {
-          this.listLoading = true;
-          //NProgress.start();
-          let para = { id: row.id };
-          removeUser(para).then((res) => {
-            this.listLoading = false;
-            //NProgress.done();
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            });
-            this.getUsers();
-          });
-        }).catch(() => {
-
-        });
+            this.listenLoading = true;
+            this.$axios     //{id: row.id}
+              .post('/deleteQuestionBank', {id: row.id}).then(resp => {
+              if (resp && resp.data.code === 100) {
+                this.listenLoading = false;
+                this.$message({
+                  message: '删除成功',
+                  type: 'success'
+                });
+                this.loadBankInfo()
+              }else {
+                this.$message({
+                  message: '删除失败',
+                  type: 'failure'
+                });
+                this.listenLoading = false;
+              }
+            })
+          }
+        ).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
     }
   }

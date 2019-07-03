@@ -83,6 +83,7 @@
       data() {
         return {
           input: '',
+          worksDetails:'',
           tableData: [{
             id: '1',
             account:'11223344',

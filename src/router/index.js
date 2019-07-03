@@ -18,6 +18,7 @@ import WorkDetailList from "@/components/teacher/WorkDetailList";
 import WorkDetail from "@/components/student/WorkDetail";
 
 import StudentIndex from "@/components/student/StudentIndex";
+import PasswordModify from "@/components/common/PasswordModify";
 
 
 Vue.use(Router)
@@ -34,6 +35,11 @@ export default new Router({
       path: '/admin_login',
       name: 'AdminLogin',
       component: AdminLogin
+    },
+    {
+      path: '/passwordModify',
+      name: 'PasswordModify',
+      component: PasswordModify
     },
 
     {

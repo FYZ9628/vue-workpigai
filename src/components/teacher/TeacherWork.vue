@@ -23,7 +23,7 @@
       </el-aside>
       <el-main style="padding-top: 10px;padding-left: 50px">
         <el-table
-          :data="tableData"
+          :data="works"
           style="width: 100%"
           height="450">
           <el-table-column
@@ -34,7 +34,7 @@
           </el-table-column>
           <el-table-column
             fit="true"
-            prop="workTitle"
+            prop="workDetail.workTitle"
             label="作业标题"
             width="200">
           </el-table-column>
@@ -98,13 +98,7 @@
     data() {
       return {
         input: '',
-        tableData: [{
-          id: '1',
-          workTitle:'11223344',
-          startTime: '2019-6-25 13:00:00',
-          endTime: '2019-6-25 13:00:00 ',
-        },
-],
+        works:'',
         keywords: '',
 
         // 完成进度数据
@@ -114,6 +108,10 @@
       }
     },
 
+    // mounted，组件挂载后，此方法执行后，页面显示
+    mounted: function () {
+      this.loadWorkInfo();
+    },
 
     methods: {
 
@@ -128,6 +126,32 @@
           }
         })
       },
+      //请求加载作业信息
+      loadWorkInfo () {
+        let _this = this
+        this.$axios.get('/workInfo').then(resp => {
+          if (resp && resp.status === 200) {
+            _this.works = resp.data;
+          }
+        })
+      },
+
+      //查询
+      searchClick () {
+        let _this = this;
+        this.$axios
+          .post('/searchWork', {
+            keywords: this.keywords
+          }).then(resp => {
+          if (resp && resp.status === 200) {
+            _this.searchResult = resp.data;
+            _this.works = _this.searchResult;
+          }
+        })
+
+      },
+
+
       //删除
       handleDelete: function (index, row) {
         this.$confirm('确认删除该记录吗?', '提示', {

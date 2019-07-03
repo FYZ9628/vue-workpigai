@@ -58,14 +58,22 @@
                 password: this.loginForm.password
               })
               .then(successResponse => {
-                this.logining = false
-                if (successResponse.data.code === 200) {
-                   var data = this.loginForm
-                   _this.$store.commit('login', _this.loginForm)
-                   var path = this.$route.query.redirect
-                   this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
-                }else {
-                  _this.$message({
+                      this.logining = false
+                      if (successResponse.data.code === 200) {//跳转到教师
+                        var data = this.loginForm
+                        _this.$store.commit('login', _this.loginForm)
+                        var path = this.$route.query.redirect
+
+                        this.$router.replace({path: path === '/' || path === undefined ? '/teacher' : path})
+                      }else  if (successResponse.data.code === 300) {//跳转到学生
+                        var data = this.loginForm
+                        _this.$store.commit('login', _this.loginForm)
+                        var path = this.$route.query.redirect
+
+                        this.$router.replace({path: path === '/' || path === undefined ? '/student' : path})
+                      }
+                      else {
+                        _this.$message({
                     message:'账号或密码错误',
                     type:'error'
                   })
