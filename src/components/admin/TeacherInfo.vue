@@ -361,8 +361,8 @@
         this.editFormVisible = true;
         // this.editForm = Object.assign({}, row);
         this.editForm = {
-          id: '',
-          teacherId:row.teacherId,
+          id: row.id,
+          userId:row.user.id,
           account: row.user.account,
           password:row.user.password,
           name: row.name,
@@ -393,13 +393,13 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
 
-              this.user.id = this.editForm.id;  //要修改的用户编号
+              this.user.id = this.editForm.userId;  //要修改的用户编号
               this.user.account = this.editForm.account;
               this.user.password = this.editForm.password;
               this.user.type = 2;
 
               this.$axios
-                .post('/addTeacher', {
+                .post('/updateTeacher', {
                   id: this.editForm.id, //要修改的教师工号
                   user: this.user,
                   name: this.editForm.name,
@@ -408,15 +408,16 @@
                 if (resp && resp.status === 200) {
                   if (resp.data == ''){
                     this.$message({
-                      message: '添加失败',
+                      message: '修改失败',
                       type: 'failure'
                     });
                     this.listenLoading = false;
                     this.addFormVisible = false;
                   }
                   if (resp && resp.status === 200) {
+                  // if (resp.data!=null) {
                     this.listenLoading = false;
-                    this.addFormVisible = false;
+                    this.editFormVisible = false;
                     this.loadTeacherInfo();
                     this.$emit('onSubmit')
                   }

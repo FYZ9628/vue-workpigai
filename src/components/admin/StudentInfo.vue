@@ -92,6 +92,10 @@
         <el-form-item label="学号" prop="account">
           <el-input v-model="addForm.account" auto-complete="off"></el-input>
         </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addForm.password" auto-complete="off"
+          ></el-input>
+        </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
@@ -125,6 +129,10 @@
       <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
         <el-form-item label="学号" prop="account">
           <el-input v-model="editForm.account" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="editForm.password" auto-complete="off"
+          ></el-input>
         </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="editForm.name" auto-complete="off"></el-input>
@@ -190,6 +198,9 @@
           account: [
             { required: true, message: '请输入学号', trigger: 'blur' }
           ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' }
+          ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
           ]
@@ -206,6 +217,9 @@
         addFormRules: {
           account: [
             { required: true, message: '请输入学号', trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' }
           ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
@@ -275,15 +289,11 @@
       },
 
 
-
-
-
-
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          id: '100',
+          id: '',
           account: '',
           name: '',
           sex: '男',
@@ -302,16 +312,17 @@
               this.user.password = this.addForm.password;
               this.user.type = 1;
 
-
-              this.mClass.classId =  this.addForm.classId,
-
+                // this.addForm.classId,
+              this.mClass.id=1;
+              // this.mClass.classId='20160001';
+              // this.mClass.className='16软件';
               this.$axios
                 .post('/addStudent', {
                   // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
                   user: this.user,
                   name: this.addForm.name,
                   sex: this.addForm.sex,
-                  mClass: this.mClass
+                  mClass:this.mClass,
                 }).then(resp => {
 
                 if (resp.data == ''){
@@ -337,6 +348,7 @@
       },
 
 
+
       //编辑用户性别选择单选按钮
       editFormChangeSex(value) {
         if (value == 1){
@@ -354,6 +366,7 @@
         this.editForm = {
           id: '',
           account: row.user.account,
+          password:row.user.password,
           name: row.name,
           sex: row.sex,
         };
@@ -407,14 +420,14 @@
         }).then(() => {
             this.listenLoading = true;
             this.$axios     //{id: row.id}
-              .post('/deleteStudent', {id: 12}).then(resp => {
+              .post('/deleteStudent', {id: row.id}).then(resp => {
               if (resp && resp.data.code === 100) {
                 this.listenLoading = false;
                 this.$message({
                   message: '删除成功',
                   type: 'success'
                 });
-                this.loadTeacherInfo()
+                this.loadStudentInfo()
               }else {
                 this.$message({
                   message: '删除失败',

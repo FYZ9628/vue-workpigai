@@ -27,7 +27,7 @@
         </el-aside>
         <el-main style="padding-top: 10px;padding-left: 50px">
           <el-table
-            :data="tableData"
+            :data="courses"
             style="width: 100%"
             height="450">
             <el-table-column
@@ -38,13 +38,13 @@
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="className"
+              prop="mClass.className"
               label="班级"
               width="200">
             </el-table-column>
             <el-table-column
               fit="true"
-              prop="name"
+              prop="teacher.name"
               label="教师"
               width="200">
             </el-table-column>
@@ -91,7 +91,7 @@
           </el-form-item>
 
           <el-form-item label="课程名" prop="className">
-            <el-select v-model="value" placeholder="请选择">
+            <el-select v-model="value" placeholder="请选择" @change="addFormchickvalue">
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -140,24 +140,23 @@
        },
     data() {
       return {
-        tableData: [{
-          id: '1',
-          className: '16软件',
-          name: '周卫',
-          courseName: '移动软件开发',
-        },
-          {
-            id: '2',
-            className: '16软件',
-            name: '文勇',
-            courseName: '操作系统',
-          },],
         input: '',
-        teachers: [], //教师信息
+        courses: [], //课程安排信息
         user:{
           id: '',
           account: '',
           password: '',
+          type: ''
+        },
+        mClass:{
+          id: '',
+          classId: '',
+          className: '',
+        },
+        teacher:{
+          id: '',
+          user: '',
+          name: '',
           type: ''
         },
         keywords: '',
@@ -212,26 +211,35 @@
         }, {
           value: '选项2',
           label: '操作系统',
-
+        },{
           value: '选项3',
           label: '项目管理'
         }],
+        value: ''
       }
     },
 
     // mounted，组件挂载后，此方法执行后，页面显示
     mounted: function () {
-      this.loadTeacherInfo();
-      this.editSubmit();
+      this.loadCourseInfo();
     },
 
     methods: {
-      //请求加载教师信息
-      loadTeacherInfo () {
+      //关闭dialog时清数据
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+        this.loadStudentInfo();
+      },
+      addFormchickvalue () {
+        this.addForm.courseName=this.value
+      },
+
+      //请求加载课程安排信息
+      loadCourseInfo () {
         let _this = this
-        this.$axios.get('/teacherInfo').then(resp => {
+        this.$axios.get('/choseCourseInfo').then(resp => {
           if (resp && resp.status === 200) {
-            _this.teachers = resp.data;
+            _this.courses = resp.data;
           }
         })
       },
@@ -240,7 +248,7 @@
       searchClick () {
         let _this = this;
         this.$axios
-          .post('/searchTeacher', {
+          .post('/searchChoseCourse', {
             keywords: this.keywords
           }).then(resp => {
           if (resp && resp.status === 200) {
@@ -248,16 +256,8 @@
 
             _this.searchResult = resp.data;
 
-            _this.teachers = _this.searchResult;
-            this.loadTeacherInfo ();
+            _this.courses = _this.searchResult;
 
-            console.log(resp.data);
-            console.log(_this.searchResult);
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
 
           }
         })
@@ -269,10 +269,10 @@
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          id: '100',
-          account: '',
-          name: '',
-          sex: '男',
+          id: '',
+          mClass: '',
+          teacher: '',
+          courseName:''
         };
       },
       //新增
@@ -283,20 +283,30 @@
               this.listenLoading = true;
 
               // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
-              this.user.account = "T116263000203";
-              this.user.password = "123456";
-              this.user.type = 2;
+              this.mClass.id=1;
+              this.teacher.id = 1;
+
 
               this.$axios
-                .post('/addTeacher', {
+                .post('/addChoseCourse', {
                   // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
-                  user: this.user,
-                  name: "编辑测试",
-                  sex: "男",
+                  mClass:this.mClass,
+                  teacher:this.teacher,
+                  courseName:'操作系统'
+                  // courseName:this.addForm.courseName
                 }).then(resp => {
+                if (resp.data == ''){
+                  this.$message({
+                    message: '添加失败',
+                    type: 'failure'
+                  });
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                }
                 if (resp && resp.status === 200) {
                   this.listenLoading = false;
                   this.addFormVisible = false;
+                  this.loadClassInfo();
                   this.$emit('onSubmit')
                 }
               })
@@ -312,7 +322,7 @@
         this.editFormVisible = true;
         //this.editForm = Object.assign({}, row);
         this.editForm = {
-          id: '100',
+          id: row.id,
           account: '',
           name: '',
           sex: '男',
@@ -357,14 +367,14 @@
         }).then(() => {
             this.listenLoading = true;
             this.$axios     //{id: row.id}
-              .post('/deleteTeacher', {id: 18}).then(resp => {
+              .post('/deleteChoseCourse', {id: row.id}).then(resp => {
               if (resp && resp.data.code === 100) {
                 this.listenLoading = false;
                 this.$message({
                   message: '删除成功',
                   type: 'success'
                 });
-                this.loadTeacherInfo()
+                this.loadCourseInfo()
               }else {
                 this.$message({
                   message: '删除失败',

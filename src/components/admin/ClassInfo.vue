@@ -27,7 +27,7 @@
         </el-aside>
         <el-main style="padding-top: 10px;padding-left: 50px">
           <el-table
-            :data="tableData"
+            :data="classs"
             style="width: 100%"
             height="450">
             <el-table-column
@@ -94,10 +94,10 @@
       <el-dialog title="编辑班级信息" :visible.sync="editFormVisible" :append-to-body='true'>
         <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
           <el-form-item label="班级号" prop="classId">
-            <el-input v-model="addForm.classId" auto-complete="off"></el-input>
+            <el-input v-model="editForm.classId" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="班级名" prop="className">
-            <el-input v-model="addForm.className" auto-complete="off"></el-input>
+            <el-input v-model="editForm.className" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -120,23 +120,13 @@
        },
     data() {
       return {
-        tableData: [{
-          id: '1',
-          classId:'20160021',
-          className: '16软件',
-        },
-          {
-            id: '2',
-            classId:'20170021',
-            className: '17软件',
-          },],
+
         input: '',
-        teachers: [], //教师信息
-        user:{
+        classs: [], //教师信息
+        class:{
           id: '',
-          account: '',
-          password: '',
-          type: ''
+          classId: '',
+          className: '',
         },
         keywords: '',
         searchResult: [],
@@ -179,17 +169,17 @@
 
     // mounted，组件挂载后，此方法执行后，页面显示
     mounted: function () {
-      this.loadTeacherInfo();
-      this.editSubmit();
+      this.loadClassInfo();
+
     },
 
     methods: {
-      //请求加载教师信息
-      loadTeacherInfo () {
+      //请求加载班级信息
+      loadClassInfo () {
         let _this = this
-        this.$axios.get('/teacherInfo').then(resp => {
+        this.$axios.get('/classInfo').then(resp => {
           if (resp && resp.status === 200) {
-            _this.teachers = resp.data;
+            _this.classs = resp.data;
           }
         })
       },
@@ -198,7 +188,7 @@
       searchClick () {
         let _this = this;
         this.$axios
-          .post('/searchTeacher', {
+          .post('/searchClass', {
             keywords: this.keywords
           }).then(resp => {
           if (resp && resp.status === 200) {
@@ -206,16 +196,8 @@
 
             _this.searchResult = resp.data;
 
-            _this.teachers = _this.searchResult;
-            this.loadTeacherInfo ();
+            _this.classs = _this.searchResult;
 
-            console.log(resp.data);
-            console.log(_this.searchResult);
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
 
           }
         })
@@ -227,10 +209,9 @@
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          id: '100',
-          account: '',
-          name: '',
-          sex: '男',
+          id: '',
+          classId: '',
+          className: '',
         };
       },
       //新增
@@ -241,20 +222,29 @@
               this.listenLoading = true;
 
               // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
-              this.user.account = "T116263000203";
-              this.user.password = "123456";
-              this.user.type = 2;
 
               this.$axios
-                .post('/addTeacher', {
+                .post('/addClass', {
                   // id: 12, id是自增的，所以当没有的时候就会默认地往后排序号
-                  user: this.user,
-                  name: "编辑测试",
-                  sex: "男",
+                  classId:this.addForm.classId,
+                  className:this.addForm.className,
                 }).then(resp => {
+                if (resp.data == ''){
+                  this.$message({
+                    message: '添加失败',
+                    type: 'failure'
+                  });
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                }
                 if (resp && resp.status === 200) {
                   this.listenLoading = false;
                   this.addFormVisible = false;
+                  this.$message({
+                    message: '添加成功',
+                    type: 'failure'
+                  });
+                  this.loadClassInfo();
                   this.$emit('onSubmit')
                 }
               })
@@ -270,10 +260,9 @@
         this.editFormVisible = true;
         //this.editForm = Object.assign({}, row);
         this.editForm = {
-          id: '100',
-          account: '',
-          name: '',
-          sex: '男',
+          id: row.id,
+          classId: row.classId,
+          className: row.className,
         };
       },
       //编辑
@@ -283,21 +272,28 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
 
-              this.user.id = 45;  //要修改的用户编号
-              this.user.account = "T116263000288";
-              this.user.password = "123456";
-              this.user.type = 2;
-
               this.$axios
-                .post('/addTeacher', {
-                  id: 14, //要修改的教师工号
-                  user: this.user,
-                  name: "编辑测试",
-                  sex: "男",
+                .post('/updateClass', {
+                  id: this.editForm.id,
+                  classId: this.editForm.classId,
+                  className: this.editForm.className,
                 }).then(resp => {
-                if (resp && resp.status === 200) {
-                  this.editFormVisible = false;
+                if (resp.data == ''){
+                  this.$message({
+                    message: '修改失败',
+                    type: 'failure'
+                  });
                   this.listenLoading = false;
+                  this.editFormVisible = false;
+                }
+                if (resp && resp.status === 200) {
+                  this.listenLoading = false;
+                  this.editFormVisible = false;
+                  this.$message({
+                    message: '修改成功',
+                    type: 'success'
+                  });
+                  this.loadClassInfo();
                   this.$emit('onSubmit')
                 }
               })
@@ -315,14 +311,14 @@
         }).then(() => {
             this.listenLoading = true;
             this.$axios     //{id: row.id}
-              .post('/deleteTeacher', {id: 18}).then(resp => {
+              .post('/deleteClass', {id: row.id}).then(resp => {
               if (resp && resp.data.code === 100) {
                 this.listenLoading = false;
                 this.$message({
                   message: '删除成功',
                   type: 'success'
                 });
-                this.loadTeacherInfo()
+                this.loadClassInfo()
               }else {
                 this.$message({
                   message: '删除失败',
