@@ -16,7 +16,7 @@
             type="textarea"
             readonly="true"
             prefix="题目题目题目"
-            v-model="question_textarea"
+            v-model="workData.workDetail.publishContent"
             resize="none"
           ></el-input>
         </div></el-col>
@@ -25,7 +25,7 @@
           <el-input
             :autosize="{ minRows: 20}"
             type="textarea"
-            v-model="submit_content"
+            v-model="submitContent"
             resize="none"
           ></el-input>
         </div></el-col>
@@ -46,8 +46,11 @@
       data() {
         return {
           input: '',
-          question_textarea:'',
-          submit_content:'',
+          questionTextarea:'',
+          submitContent:'',
+
+          // 详情界面接收作业列表传过来的数据
+          workData:this.$route.query.data
         }
       },
 
