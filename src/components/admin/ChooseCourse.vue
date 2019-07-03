@@ -214,15 +214,15 @@
 
         editFormVisible: false,//编辑界面是否显示
         editFormRules: {
-          className: [
-            { required: true, message: '请输入班级名', trigger: 'blur' }
-          ],
-          teacherName: [
-            { required: true, message: '请输入教师名', trigger: 'blur' }
-          ],
-          courseName: [
-            { required: true, message: '请选择课程', trigger: 'blur' }
-          ]
+          // className: [
+          //   { required: true, message: '请输入班级名', trigger: 'blur' }
+          // ],
+          // teacherName: [
+          //   { required: true, message: '请输入教师名', trigger: 'blur' }
+          // ],
+          // courseName: [
+          //   { required: true, message: '请选择课程', trigger: 'blur' }
+          // ]
         },
         //编辑界面数据
         editForm: {
@@ -475,11 +475,18 @@
       handleEdit: function (index,row) {
         this.editFormVisible = true;
         //this.editForm = Object.assign({}, row);
+
         this.editForm = {
           id: row.id,
           account: '',
           name: '',
           sex: '男',
+
+          // //三个下拉框的默认选项
+          // courseOptionsValue: row.id.className,
+          // classOptionsValue: '',
+          // teacherOptionsValue: ''
+
         };
       },
       //编辑
@@ -510,7 +517,7 @@
                     type: 'success'
                   });
                   this.listenLoading = false;
-                  this.addFormVisible = false;
+                  this.editFormVisible = false;
                   this.loadChooseCourseInfo();
                   this.$emit('onSubmit')
                 }

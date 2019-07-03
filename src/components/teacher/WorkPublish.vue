@@ -6,9 +6,11 @@
         <el-col :span="7"><div class="grid-content bg-purple">
           <span style="font-size: 20px;font-weight: bold">题库选择题目</span>
           <el-table
-            :data="banks"
+            ref="multipleTable"
+            :data="questionBanks"
             style="width: 100%"
-            height="450">
+            height="450"
+            @selection-change="handleSelectionChange">
             <el-table-column
               fixed
               prop="questionId"
@@ -21,8 +23,10 @@
               label="题目标题"
               width="150">
             </el-table-column>
+
             <el-table-column type="selection" width="55">
             </el-table-column>
+
           </el-table>
         </div></el-col>
         <el-col :span="7"><div class="grid-content bg-purple">
@@ -30,7 +34,7 @@
           <el-input
             :autosize="{ minRows: 20,maxRows:20}"
             type="textarea"
-            v-model="question_textarea"
+            v-model="questionTextarea"
             resize="none"
           ></el-input>
         </div></el-col>
@@ -39,7 +43,7 @@
           <el-input
             :autosize="{ minRows: 20}"
             type="textarea"
-            v-model="anwser_textarea"
+            v-model="answerTextarea"
             resize="none"
           ></el-input>
         </div></el-col>
@@ -88,7 +92,7 @@
                   </el-select>
 
                   <el-date-picker
-                    v-model="endTime_picker"
+                    v-model="endTimePicker"
                     type="datetime"
                     placeholder="选择截止时间">
                   </el-date-picker>
@@ -107,11 +111,13 @@
       data() {
         return {
           workTitle: '',
-          question_textarea: '',//题目文本
-          anwser_textarea: '',//答案文本
+          questionTextarea: '',//题目文本
+          answerTextarea: '',//答案文本
 
-          endTime_picker:'',//截止时间
-          banks:'',//题库表格数据
+          endTimePicker:'',//截止时间
+          questionBanks:'',//题库表格数据
+
+          multipleSelection: [], //题库多选
 
           options: [{
             value: '选项1',
@@ -142,13 +148,27 @@
           let _this = this
           this.$axios.get('/questionBankInfo').then(resp => {
             if (resp && resp.status === 200) {
-              _this.banks = resp.data;
+              _this.questionBanks = resp.data;
             }
           })
         },
         //处理发布作业
         handlePublish: function () {
+        },
+
+        handleSelectionChange(value) {
+          this.multipleSelection = value;
+
+
+
+
+          console.log("多选框测试"+value[0].questionId);
+          console.log("多选框测试"+value[0].title);
+          console.log("多选框测试"+value);
+          console.log("多选框测试"+value);
+          console.log("多选框测试"+value);
         }
+
       }
     }
 </script>
