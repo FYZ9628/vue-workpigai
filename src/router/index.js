@@ -5,7 +5,6 @@ import AdminLogin from '@/components/AdminLogin'
 import StudentInfo from "@/components/admin/StudentInfo";
 import TeacherInfo from "@/components/admin/TeacherInfo";
 import ClassInfo from "@/components/admin/ClassInfo";
-import Course from "@/components/admin/Course";
 
 import AdminHome from "@/components/AdminHome";
 import StudentHome from "@/components/StudentHome";
@@ -19,6 +18,7 @@ import WorkDetail from "@/components/student/WorkDetail";
 
 import StudentIndex from "@/components/student/StudentIndex";
 import PasswordModify from "@/components/common/PasswordModify";
+import ChooseCourse from "../components/admin/ChooseCourse";
 
 
 Vue.use(Router)
@@ -74,9 +74,9 @@ export default new Router({
           }
         },
         {
-          path: '/course',
-          name: 'Course',
-          component: Course,
+          path: '/chooseCourse',
+          name: 'ChooseCourse',
+          component: ChooseCourse,
           meta: {
             requireAuth: true
           }

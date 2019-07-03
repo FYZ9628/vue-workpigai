@@ -33,7 +33,7 @@
           {name: '/teacherInfo', navItem: '教师信息'},
           {name: '/studentInfo', navItem: '学生信息'},
           {name: '/classInfo', navItem: '班级信息'},
-          {name: '/course', navItem: '课程安排'}
+          {name: '/chooseCourse', navItem: '课程安排'}
         ]
       }
     },
