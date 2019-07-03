@@ -75,7 +75,8 @@
       </el-container>
 
   <!--新增界面-->
-      <el-dialog title="新增班级信息" :visible.sync="addFormVisible" :append-to-body='true'>
+      <el-dialog title="新增班级信息" :visible.sync="addFormVisible" :append-to-body='true'
+                 @close="resetForm('addForm')">
         <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
           <el-form-item label="班级号" prop="classId">
             <el-input v-model="addForm.classId" auto-complete="off"></el-input>
@@ -91,7 +92,8 @@
       </el-dialog>
 
       <!--编辑界面-->
-      <el-dialog title="编辑班级信息" :visible.sync="editFormVisible" :append-to-body='true'>
+      <el-dialog title="编辑班级信息" :visible.sync="editFormVisible" :append-to-body='true'
+                 @close="resetForm('editForm')">
         <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
           <el-form-item label="班级号" prop="classId">
             <el-input v-model="editForm.classId" auto-complete="off"></el-input>
@@ -174,6 +176,10 @@
     },
 
     methods: {
+      // 关闭dialog时清数据
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
       //请求加载班级信息
       loadClassInfo () {
         let _this = this
@@ -242,7 +248,7 @@
                   this.addFormVisible = false;
                   this.$message({
                     message: '添加成功',
-                    type: 'failure'
+                    type: 'success'
                   });
                   this.loadClassInfo();
                   this.$emit('onSubmit')

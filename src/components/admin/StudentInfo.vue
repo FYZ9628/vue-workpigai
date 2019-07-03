@@ -100,15 +100,15 @@
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-radio-group v-model="addForm.sex">
+          <el-radio-group v-model="radios" @change="addFormChangeSex">
             <el-radio class="radio" :label="1">男</el-radio>
             <el-radio class="radio" :label="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="班级" prop="className">
-          <el-select v-model="value" placeholder="请选择">
+          <el-select v-model="addForm.classOptionsValue" placeholder="请选择" @change="addFormClassOptionValue">
             <el-option
-              v-for="item in options"
+              v-for="item in classOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value">
@@ -144,9 +144,9 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="班级" prop="className">
-          <el-select v-model="value" placeholder="请选择">
+          <el-select v-model="editForm.classOptionsValue" placeholder="请选择" @change="editFormClassOptionValue">
             <el-option
-              v-for="item in options"
+              v-for="item in classOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value">
@@ -174,7 +174,8 @@
     data() {
       return {
         input: '',
-        students: [],
+        students: [],//学生信息
+        classes:[], //班级信息
         user:{
           id: '',
           account: '',
@@ -207,9 +208,11 @@
         },
         //编辑界面数据
         editForm: {
-          user: '',
+          account: '',
+          password:'',
           name: '',
           sex: -1,
+          classOptionsValue: '',
         },
 
         addFormVisible: false,//新增界面是否显示
@@ -228,23 +231,21 @@
         //新增界面数据
         addForm: {
           account: '',
+          password:'',
           name: '',
           sex: -1,
+          classOptionsValue: '',
 
         },
-        options: [{
-          value: '选项1',
-          label: '16软件'
-        }, {
-          value: '选项2',
-          label: '17软件',
-        },{
-          value: '选项3',
-          label: '18软件'
-        }
-        ],
-        value: '',
+        // 班级名下拉框数据
+        classOptions: [],
+
+        returnData: {
+          classId: '',
+        },
+
         radios: 1 //默认性别为 男
+
       }
     },
 
@@ -262,6 +263,18 @@
         this.$refs[formName].resetFields();
         this.loadStudentInfo();
       },
+      //新增界面班级下拉框
+      addFormClassOptionValue (value){
+        this.addForm.classOptionsValue=value;
+        this.returnData.classId = value;
+      },
+      //编辑界面班级下拉框
+      editFormClassOptionValue (value){
+        this.editForm.classOptionsValue=value;
+        this.returnData.classId = value;
+      },
+
+
       //请求加载学生信息
       loadStudentInfo () {
         let _this = this
@@ -270,6 +283,27 @@
             _this.students = resp.data;
           }
         })
+        //请求加载班级信息
+        this.$axios.get('/classInfo').then(resp => {
+          if (resp && resp.status === 200) {
+            _this.classes = resp.data;
+
+            let tempClasses = [];
+            for (let i = 0; i < _this.classes.length; ++i) {
+              let tempClassOption= {
+                value: '',
+                label: ''
+              };
+              let ii = i +1;
+              // tempCourseOption.value = "选项"+ii;
+              tempClassOption.value = _this.classes[i].id;
+              tempClassOption.label = _this.classes[i].className;
+              tempClasses.push(tempClassOption)
+            }
+            this.classOptions = tempClasses;
+
+          }
+        });
       },
 
       //查询
@@ -293,8 +327,8 @@
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          id: '',
           account: '',
+          password:'',
           name: '',
           sex: '男',
           className: ''
@@ -312,8 +346,8 @@
               this.user.password = this.addForm.password;
               this.user.type = 1;
 
-                // this.addForm.classId,
-              this.mClass.id=1;
+
+              this.mClass.id=this.returnData.classId;
               // this.mClass.classId='20160001';
               // this.mClass.className='16软件';
               this.$axios
@@ -336,7 +370,11 @@
                 if (resp && resp.status === 200) {
                   this.listenLoading = false;
                   this.addFormVisible = false;
-                  this.loadTeacherInfo();
+                  this.$message({
+                    message: '删除成功',
+                    type: 'success'
+                  });
+                  this.loadStudentInfo();
                   this.$emit('onSubmit')
                 }
 
@@ -348,7 +386,15 @@
       },
 
 
-
+      //添加用户性别选择单选按钮
+      addFormChangeSex(value) {
+        if (value == 1){
+          this.addForm.sex = '男'
+        }
+        if (value == 0) {
+          this.addForm.sex = '女'
+        }
+      },
       //编辑用户性别选择单选按钮
       editFormChangeSex(value) {
         if (value == 1){
@@ -364,7 +410,8 @@
         // this.editForm = Object.assign({}, row);
         // this.editForm.user=row.user;
         this.editForm = {
-          id: '',
+          id: row.id,
+          userId:row.user.id,
           account: row.user.account,
           password:row.user.password,
           name: row.name,
@@ -384,28 +431,44 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
 
-              this.user.id = 50;  //要修改的用户编号
-              this.user.account = "116263000301";
-              this.user.password = "123456";
-              this.user.type = 3;
+              // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
+              this.user.id =this.editForm.userId;
+              this.user.account = this.editForm.account;
+              this.user.password = this.editForm.password;
+              this.user.type = 1;
 
-              this.mClass.classId =  2016,
 
-                this.$axios
-                  .post('/addStudent', {
-                    id: 12, //要修改的学号
-                    user: this.user,
-                    name: "修改学生",
-                    sex: "男",
-                    mClass: this.mClass
-                  }).then(resp => {
-                  if (resp && resp.status === 200) {
-                    this.listenLoading = false;
-                    this.editFormVisible = false;
-                    this.$emit('onSubmit')
-                  }
-                })
+              this.mClass.id=this.returnData.classId;
+              this.$axios
+                .post('/updateStudent', {
 
+                  id:this.editForm.id,
+                  user: this.user,
+                  name: this.editForm.name,
+                  sex: this.editForm.sex,
+                  mClass:this.mClass,
+                }).then(resp => {
+
+                if (resp.data == ''){
+                  this.$message({
+                    message: '编辑失败',
+                    type: 'failure'
+                  });
+                  this.listenLoading = false;
+                  this.editFormVisible = false;
+                }
+                if (resp && resp.status === 200) {
+                  this.listenLoading = false;
+                  this.editFormVisible = false;
+                  this.$message({
+                    message: '编辑成功',
+                    type: 'success'
+                  });
+                  this.loadStudentInfo();
+                  this.$emit('onSubmit')
+                }
+
+              })
 
             });
           }

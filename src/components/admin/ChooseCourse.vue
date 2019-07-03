@@ -134,13 +134,36 @@
       <el-dialog title="编辑课程安排" :visible.sync="editFormVisible" :append-to-body='true'>
         <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
           <el-form-item label="班级" prop="className">
-            <el-input v-model="addForm.className" auto-complete="off"></el-input>
+            <el-select v-model="editForm.classOptionsValue" placeholder="请选择" @change="editFormClassOptionValue">
+              <el-option
+                v-for="item in classOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
+
           <el-form-item label="教师" prop="teacherName">
-            <el-input v-model="addForm.name" auto-complete="off"></el-input>
+            <el-select v-model="editForm.teacherOptionsValue" placeholder="请选择" @change="editFormTeacherOptionValue">
+              <el-option
+                v-for="item in teacherOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="课程名" prop="courseName">
-            <el-input v-model="addForm.courseName" auto-complete="off"></el-input>
+
+          <el-form-item label="课程名" prop="CourseName">
+            <el-select v-model="editForm.courseOptionsValue" placeholder="请选择" @change="editFormCourseOptionValue">
+              <el-option
+                v-for="item in courseOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -207,6 +230,10 @@
           className: '',
           name: '',
           courseName: '',
+          //三个下拉框的默认选项
+          courseOptionsValue: '',
+          classOptionsValue: '',
+          teacherOptionsValue: ''
         },
 
         addFormVisible: false,//新增界面是否显示
@@ -244,7 +271,7 @@
         teacherOptions:[],
 
         returnData: {
-          chooseCourseId:'',
+         // chooseCourseId:'',
           courseId: '',
           classId: '',
           teacherId: ''
@@ -260,14 +287,14 @@
 
     // mounted，组件挂载后，此方法执行后，页面显示
     mounted: function () {
-      this.loadCourseInfo();
+      this.loadChooseCourseInfo();
     },
 
     methods: {
       //关闭dialog时清数据
       resetForm(formName) {
         this.$refs[formName].resetFields();
-        this.loadStudentInfo();
+        this.loadChooseCourseInfo();
       },
 
 
@@ -284,8 +311,20 @@
         this.returnData.classId = value;
       },
 
+      editFormCourseOptionValue (value) {
+        this.addForm.courseOptionsValue=value;
+        this.returnData.courseId = value;
+      },
+      editFormTeacherOptionValue (value) {
+        this.addForm.teacherOptionsValue=value;
+        this.returnData.teacherId = value;
+      },
+      editFormClassOptionValue (value){
+        this.addForm.classOptionsValue=value;
+        this.returnData.classId = value;
+      },
       //请求加载课程、班级、教师信息
-      loadCourseInfo () {
+      loadChooseCourseInfo () {
         let _this = this;
         //请求加载选课安排信息
         this.$axios.get('/choseCourseInfo').then(resp => {
@@ -415,9 +454,13 @@
                   this.addFormVisible = false;
                 }
                 if (resp && resp.status === 200) {
+                  this.$message({
+                    message: '添加成功',
+                    type: 'success'
+                  });
                   this.listenLoading = false;
                   this.addFormVisible = false;
-                  this.loadCourseInfo();
+                  this.loadChooseCourseInfo();
                   this.$emit('onSubmit')
                 }
               })
@@ -445,18 +488,30 @@
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.listenLoading = true;
-
               this.$axios
-                .post('/addTeacher', {
-                  chooseCourseId: '',
+                .post('/updateChoseCourse', {
+                  chooseCourseId:this.editForm.id,
                   courseId: this.returnData.courseId,
                   teacherId: this.returnData.teacherId,
                   classId: this.returnData.classId
 
                 }).then(resp => {
-                if (resp && resp.status === 200) {
-                  this.editFormVisible = false;
+                if (resp.data == ''){
+                  this.$message({
+                    message: '添加失败',
+                    type: 'failure'
+                  });
                   this.listenLoading = false;
+                  this.addFormVisible = false;
+                }
+                if (resp && resp.status === 200) {
+                  this.$message({
+                    message: '编辑成功',
+                    type: 'success'
+                  });
+                  this.listenLoading = false;
+                  this.addFormVisible = false;
+                  this.loadChooseCourseInfo();
                   this.$emit('onSubmit')
                 }
               })
@@ -474,10 +529,6 @@
         }).then(() => {
             this.listenLoading = true;
 
-            console.log("id测试"+row.id)
-            console.log("id测试"+row.id)
-            console.log("id测试"+row.id)
-            console.log("id测试"+row.id)
 
             this.$axios     //{id: row.id}
               .post('/deleteChoseCourse', {id: row.id}).then(resp => {
@@ -487,7 +538,7 @@
                   message: '删除成功',
                   type: 'success'
                 });
-                this.loadCourseInfo()
+                this.loadChooseCourseInfo()
               }else {
                 this.$message({
                   message: '删除失败',
