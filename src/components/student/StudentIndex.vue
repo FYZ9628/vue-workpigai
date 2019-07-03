@@ -34,6 +34,9 @@
               prop="id"
               label="序号"
               width="100" >
+              <template slot-scope="scope">
+                {{scope.$index+1}}
+              </template>
             </el-table-column>
             <el-table-column
               fit="true"
@@ -96,31 +99,6 @@
         </el-footer>
       </el-container>
 
-  <!--作业详情界面-->
-      <el-dialog title="作业详情" :visible.sync="workFormVisible" :append-to-body='true'>
-        <el-form :model="workForm" label-width="80px" :rules="workFormRules">
-
-          <el-form-item label="作业内容" >
-            <el-input
-              type="textarea"
-              v-model="workForm.content"
-              auto-complete="off"
-              :readonly="true"
-              :autosize="{ minRows: 8,maxRows:10}"></el-input>
-          </el-form-item>
-          <el-form-item label="答题区域">
-            <el-input
-              type="textarea"
-               v-model="workForm.detail"
-               auto-complete="off"
-               :autosize="{ minRows: 8}"></el-input>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="workFormVisible = false">取 消</el-button>
-          <el-button type="primary"style="background-color: #545c64" @click.native="workSubmit" :loading="workLoading">提 交</el-button>
-        </div>
-      </el-dialog>
 
       <!--查看答案界面-->
       <el-dialog title="作业答案" :visible.sync="checkFormVisible" :append-to-body='true'>
@@ -129,7 +107,7 @@
           <el-form-item label="作业内容" >
             <el-input
               type="textarea"
-              v-model="checkForm.content2"
+              v-model="checkForm.content"
               auto-complete="off"
               :readonly="true"
               :autosize="{ minRows: 8,maxRows:10}"></el-input>
@@ -166,98 +144,24 @@
         listenLoading: false,
 
 
-
-        tableData: [{
-          id: '1',
-          name: '王小虎',
-          workTitle:'操作系统实验1',
-          startTime:'2019-7-5 23:59',
-          endTime:'2019-7-5 23:59',
-          state:'已提交',
-          score: '90 ',
-        },
-          {
-            id: '1',
-            name: '王小虎',
-            workTitle:'操作系统实验1',
-            startTime:'2019-7-5 23:59',
-            endTime:'2019-7-5 23:59',
-            state:'已提交',
-            score: '90 ',
-          },
-          {
-            id: '1',
-            name: '王小虎',
-            workTitle:'操作系统实验2',
-            startTime:'2019-7-5 23:59',
-            endTime:'2019-7-5 23:59',
-            state:'已提交',
-            score: '90 ',
-          },
-          {
-            id: '1',
-            name: '王小虎',
-            workTitle:'安卓实验报告1',
-            startTime:'2019-7-5 23:59',
-            endTime:'2019-7-5 23:59',
-            state:'未提交',
-            score: ' ',
-          },
-          {
-            id: '1',
-            name: '王小虎',
-            workTitle:'安卓实验报告2',
-            startTime:'2019-7-5 23:59',
-            endTime:'2019-7-5 23:59',
-            state:'已提交',
-            score: '90 ',
-          },],
-
-
-        workFormVisible: false,//作业详情界面是否显示
-        workLoading: false,
-
-        workFormRules: {
-
-        },
-        //作业详情界面数据
-        workForm: {
-          workTitle:'安卓实验报告2',
-          endTime:'2019-7-5 23:59',
-          content:'作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容',
-          detail:'答案内容答案内容答案内容答案内容答案内容答案内容答案内容答案内容',
-          score: '90 ',
-        },
-
-
         checkFormVisible: false,//查看答案界面是否显示
         checkLoading: false,
         checkFormRules: {
         },
         //查看答案界面数据
         checkForm: {
-          content:'作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
-            '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容',
-          answer:'答案内容答案内容答案内容答案内容答案内容答案内容答案内容答案内容',
+          // content:'作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容' +
+          //   '作业内容作业内容作业内容作业内容作业内容作业内容作业内容作业内容',
+          // answer:'答案内容答案内容答案内容答案内容答案内容答案内容答案内容答案内容',
 
         },
 
@@ -270,7 +174,7 @@
     },
 
     methods: {
-      //请求加载学生信息
+      //请求加载学生作业信息
       loadWorkInfo () {
         let _this = this
         this.$axios.get('/workInfo').then(resp => {
@@ -292,16 +196,8 @@
 
             _this.searchResult = resp.data;
 
-            _this.students = _this.searchResult;
-            this.loadStudentInfo();
+            _this.works = _this.searchResult;
 
-            console.log(resp.data);
-            console.log(_this.searchResult);
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
-            console.log("搜索测试");
 
           }
         })
@@ -310,50 +206,18 @@
 
 
 
-
-
-
-      //显示作业详情界面
-      handleWork: function (index, row) {
-        this.workFormVisible = true;
-        this.editForm = Object.assign({}, row);
-      },
-
-      //作业提交按钮逻辑
-      workSubmit: function () {
-        this.$refs.editForm.validate((valid) => {
-          if (valid) {
-            this.$confirm('确认提交吗？', '提示', {}).then(() => {
-              this.editLoading = true;
-              //NProgress.start();
-              let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              editUser(para).then((res) => {
-                this.editLoading = false;
-                //NProgress.done();
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['editForm'].resetFields();
-                this.editFormVisible = false;
-                this.getUsers();
-              });
-            });
-          }
-        });
-      },
-
       //显示查看作业答案界面
       handleCheck: function (index, row) {
         this.checkFormVisible = true;
-        this.checkForm = Object.assign({}, row);
+        //this.checkForm = Object.assign({}, row);
+        this.checkForm = {
+          content:row.workDetail.publishContent,
+          answer:row.workDetail.answer,
+        };
       },
-
 
       //点击跳转到显示详情界面，传递参数过去，在详情界面需要接受
       handleDetail: function (index, row) {
-
         this.$router.push({
           path: '/workDetail',
           // name: 'mallList',

@@ -34,7 +34,13 @@
 <script>
   export default {
     name: 'commonHeader',
+    data(){
+      username:''
+    },
     methods:{
+      login:function(){
+
+      },
       //退出登录
       logout: function () {
         var _this = this;
