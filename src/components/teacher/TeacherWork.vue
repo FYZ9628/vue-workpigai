@@ -99,7 +99,7 @@
         input: '',
         works:'',
         keywords: '',
-
+        account:localStorage.getItem("account"),
         // 完成进度数据
         processData:{
           process:'25'
