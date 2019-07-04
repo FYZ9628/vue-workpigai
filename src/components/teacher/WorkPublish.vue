@@ -96,7 +96,7 @@
                     type="datetime"
                     placeholder="选择截止时间">
                   </el-date-picker>
-                  <el-button type="primary" style="background-color: #545c64;" v-on:click="handlePublish">发 布</el-button>
+                  <el-button type="primary" style="background-color: #545c64;" @click.native="handlePublish" :loading="listenLoading">发 布</el-button>
 
       </div>
 
@@ -118,17 +118,21 @@
           questionBanks: [],//题库表格数据
           classes:[],
           classOptions: [],
-          classOptionValue: '', //选中选择之后的值
+          classOptionsValue: '', //选中选择之后的值
           multipleSelection: [], //题库多选
+
+          listenLoading: false,
+
+          worksDetail :{
+            id: '',
+            workTitle: '',
+            publishContent: '',
+            answer: ''
+          },
 
           Work: {
             id: '',
-            worksDetail :{
-              id: '',
-              workTitle: '',
-              publishContent: '',
-              answer: ''
-            },
+            workDetail:'',
             teacherId: '',
             classId: '',
             endTime: ''
@@ -180,24 +184,32 @@
 
         handleSelectionChange(value) {
           this.multipleSelection = value;
+        },
 
-          console.log("多选框测试"+value[0].questionId);
-          console.log("多选框测试"+value[0].title);
-          console.log("多选框测试"+value);
-          console.log("多选框测试"+value);
-          console.log("多选框测试"+value);
+        classOptionValueChange (value){
+          this.classOptionsValue=value;
         },
 
         handleWork: function() {
+          let x = 0;
+          for (let i = 0; i < this.questionBanks.length; i++) {
+            for (let j = 0; j <this.multipleSelection.length; j++) {
+              if (this.questionBanks[i].id == this.multipleSelection[j].id){
+                x += 1;
+                this.worksDetail.publishContent += x + " 、 " +this.questionBanks[i].content +"\n\n";
+                this.worksDetail.answer += x + " 、 " +this.questionBanks[i].answer +"\n\n";
 
-          // this.work.worksDetail.workTitle = this.multipleSelection
-          for (let i = 0; i < this.multipleSelection.length; i++) {
-            if (this.questionBanks[i].id == this.multipleSelection[i].id){
-              this.work.worksDetail.publishContent += i + " 、 " +this.questionBanks[i].content;
+              }
             }
 
           }
-          this.work.worksDetail.publishContent = this.multipleSelection
+
+          // this.worksDetail.workTitle = this.workTitle;
+
+          console.log("测试测试");
+          console.log("测试测试");
+          console.log("测试测试\n"+this.worksDetail.publishContent);
+          console.log("测试测试\n"+this.worksDetail.answer);
 
         },
 
@@ -205,22 +217,68 @@
         //处理发布作业
         handlePublish: function () {
 
-          let tempWork = {
-            id: '',
-            worksDetail :{
-              id: '',
-              workTitle: '',
-              publishContent: '',
-              answer: ''
-            },
-            teacherId: '',
-            classId: '',
-            endTime: ''
-          };
+          this.handleWork();
 
+          // let tempWork = {
+          //   id: '',
+          //   worksDetailId: '',
+          //   worksDetailWorkTitle: this.workTitle,
+          //   worksDetailPublishContent: this.worksDetail.publishContent,
+          //   worksDetailAnswer: this.worksDetail.answer,
+          //   teacherId: 7,
+          //   classId: this.classOptionsValue,
+          //   endTime: this.endTimePicker
+          // };
+          //
+          // console.log("发布测试");
+          // console.log(tempWork.id);
+          // console.log(tempWork.worksDetailId);
+          // console.log(tempWork.worksDetailWorkTitle);
+          // console.log(tempWork.worksDetailPublishContent);
+          // console.log(tempWork.worksDetailAnswer);
+          // console.log(tempWork.teacherId);
+          // console.log(tempWork.classId);
+          // console.log(tempWork.endTime);
+
+
+          this.$confirm('确认发布?', '提示', {
+            type: 'warning'
+          }).then(() => {
+              this.listenLoading = true;
+              this.$axios
+                .post('/publishWork', {
+                  id: 99,
+                  worksDetailId: 99,
+                  worksDetailWorkTitle: this.workTitle,
+                  worksDetailPublishContent: this.worksDetail.publishContent,
+                  worksDetailAnswer: this.worksDetail.answer,
+                  teacherId: 7,
+                  classId: this.classOptionsValue,
+                  endTime: this.endTimePicker
+                  }).then(resp => {
+                if (resp && resp.data.code === 100) {
+                  this.listenLoading = false;
+                  this.$message({
+                    message: '发布成功',
+                    type: 'success'
+                  });
+                }else {
+                  this.$message({
+                    message: '发布失败',
+                    type: 'failure'
+                  });
+                  this.listenLoading = false;
+                }
+              })
+            }
+          ).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消发布'
+            })
+          })
 
         },
-
 
       }
     }
