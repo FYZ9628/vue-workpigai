@@ -82,9 +82,9 @@
           style="width: 300px;margin-right: 10px"
           v-model="workTitle">
         </el-input>
-                  <el-select v-model="value" placeholder="选择发布班级">
+                  <el-select v-model="classOptionsValue" placeholder="选择发布班级" @change="classOptionValueChange">
                     <el-option
-                      v-for="item in options"
+                      v-for="item in classOptions"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value">
@@ -115,27 +115,26 @@
           answerTextarea: '',//答案文本
 
           endTimePicker:'',//截止时间
-          questionBanks:'',//题库表格数据
-
+          questionBanks: [],//题库表格数据
+          classes:[],
+          classOptions: [],
+          classOptionValue: '', //选中选择之后的值
           multipleSelection: [], //题库多选
 
-          options: [{
-            value: '选项1',
-            label: '16软件'
-          }, {
-            value: '选项2',
-            label: '17软件'
-          }, {
-            value: '选项3',
-            label: '18软件'
-          }, {
-            value: '选项4',
-            label: '16网络'
-          }, {
-            value: '选项5',
-            label: '16信管'
-          }],
-          value: ''
+          Work: {
+            id: '',
+            worksDetail :{
+              id: '',
+              workTitle: '',
+              publishContent: '',
+              answer: ''
+            },
+            teacherId: '',
+            classId: '',
+            endTime: ''
+          },
+
+
         }
 
       },
@@ -150,24 +149,78 @@
             if (resp && resp.status === 200) {
               _this.questionBanks = resp.data;
             }
-          })
+          });
+
+
+          //请求加载班级信息
+          this.$axios.get('/classInfo').then(resp => {
+            if (resp && resp.status === 200) {
+              _this.classes = resp.data;
+
+              let tempClasses = [];
+              for (let i = 0; i < _this.classes.length; ++i) {
+                let tempClassOption= {
+                  value: '',
+                  label: ''
+                };
+                let ii = i +1;
+                // tempCourseOption.value = "选项"+ii;
+                tempClassOption.value = _this.classes[i].id;
+                tempClassOption.label = _this.classes[i].className;
+                tempClasses.push(tempClassOption)
+              }
+              this.classOptions = tempClasses;
+
+            }
+          });
+
+
         },
-        //处理发布作业
-        handlePublish: function () {
-        },
+
 
         handleSelectionChange(value) {
           this.multipleSelection = value;
-
-
-
 
           console.log("多选框测试"+value[0].questionId);
           console.log("多选框测试"+value[0].title);
           console.log("多选框测试"+value);
           console.log("多选框测试"+value);
           console.log("多选框测试"+value);
-        }
+        },
+
+        handleWork: function() {
+
+          // this.work.worksDetail.workTitle = this.multipleSelection
+          for (let i = 0; i < this.multipleSelection.length; i++) {
+            if (this.questionBanks[i].id == this.multipleSelection[i].id){
+              this.work.worksDetail.publishContent += i + " 、 " +this.questionBanks[i].content;
+            }
+
+          }
+          this.work.worksDetail.publishContent = this.multipleSelection
+
+        },
+
+
+        //处理发布作业
+        handlePublish: function () {
+
+          let tempWork = {
+            id: '',
+            worksDetail :{
+              id: '',
+              workTitle: '',
+              publishContent: '',
+              answer: ''
+            },
+            teacherId: '',
+            classId: '',
+            endTime: ''
+          };
+
+
+        },
+
 
       }
     }
