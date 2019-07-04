@@ -262,9 +262,10 @@
                     message: '发布成功',
                     type: 'success'
                   });
+                  this.loadBankInfo();
                 }else {
                   this.$message({
-                    message: '发布失败',
+                    message: '该班级没有学生，发布失败',
                     type: 'failure'
                   });
                   this.listenLoading = false;
