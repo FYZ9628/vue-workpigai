@@ -40,10 +40,17 @@
           </el-table-column>
           <el-table-column
             fit="true"
+            prop="student.mClass.className"
+            label="发布班级"
+            width="200">
+          </el-table-column>
+          <el-table-column
+            fit="true"
             prop="startTime"
             label="发布时间"
             width="200">
           </el-table-column>
+
           <el-table-column
             fit="true"
             prop="endTime"
@@ -161,8 +168,17 @@
           if (resp && resp.status === 200) {
             _this.searchResult = resp.data;
             _this.works = _this.searchResult;
+
+            let tempWorkList = [];
+            for (let i = 0; i < _this.searchResult.length; i++) {
+              if (_this.searchResult[i].teacher.user.account == this.account){
+                tempWorkList.push(_this.searchResult[i]);
+              }
+            }
+            _this.works = tempWorkList;
+
           }
-        })
+        });
 
       },
 

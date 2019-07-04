@@ -206,12 +206,19 @@
       searchClick () {
         let _this = this;
         this.$axios
-          .post('/searchStudent', {
+          .post('/searchWork', {
             keywords: this.keywords
           }).then(resp => {
           if (resp && resp.status === 200) {
             _this.searchResult = resp.data;
-            _this.works = _this.searchResult;
+
+            let tempWorkList = [];
+            for (let i = 0; i < _this.searchResult.length; i++) {
+              if (_this.searchResult[i].student.user.account == this.account){
+                tempWorkList.push(_this.searchResult[i]);
+              }
+            }
+            _this.works = tempWorkList;
 
           }
         })

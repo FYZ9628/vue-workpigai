@@ -7,24 +7,24 @@
 
     <el-main style="margin-left: auto; margin-right: auto;">
         <el-table
-          :data="tableData"
+          :data="works"
           style="width: 1400px"
           height="450">
           <el-table-column
             fixed
-            prop="id"
+            prop="student.id"
             label="序号"
             width="200" >
           </el-table-column>
           <el-table-column
             fit="true"
-            prop="account"
+            prop="student.user.account"
             label="学号"
             width="200" >
           </el-table-column>
           <el-table-column
             fit="true"
-            prop="name"
+            prop="student.name"
             label="学生姓名"
             width="200" >
           </el-table-column>
@@ -82,32 +82,11 @@
         name: "WorkDetailList",
       data() {
         return {
+          account:localStorage.getItem("account"),
+          // 详情界面接收作业列表传过来的数据
+          workDetailId:this.$route.query.data.workDetail.id,
+          works: [],  //个人账号里面发布的所有作业
           input: '',
-          worksDetails:'',
-          tableData: [{
-            id: '1',
-            account:'11223344',
-            name: '雪碧',
-            score: '90 ',
-          },
-            {
-              id: '2',
-              account:'11223344',
-              name: '雪碧',
-              score: '89 ',
-            },
-            {
-              id: '3',
-              account:'11223344',
-              name: '雪碧',
-              score: '98 ',
-            },{
-              id: '4',
-              account:'11223344',
-              name: '雪碧',
-              score: '90 ',
-            },
-          ],
           correctFormVisible: false,//新增界面是否显示
           correctLoading: false,
           correctFormRules: {
@@ -120,8 +99,36 @@
           }
         }
       },
+      // mounted，组件挂载后，此方法执行后，页面显示
+      mounted: function () {
+        this.loadWorkInfo();
 
+      },
       methods: {
+
+        //请求加载学生作业信息
+        loadWorkInfo () {
+          let _this = this
+          this.$axios
+            .post('/getTeacherPersonalWork', {
+              keywords: this.account
+            }).then(resp => {
+            if (resp && resp.status === 200) {
+              _this.works = resp.data;
+
+              let tempWorkList = [];
+              for (let i = 0; i < _this.works.length; i++) {
+                if (_this.workDetailId == _this.works[i].workDetail.id){
+                  tempWorkList.push(_this.works[i])
+                  }
+              }
+              _this.works = tempWorkList;
+            }
+          })
+
+        },
+
+
         goBack() {
           window.history.back()
           console.log('go back');
@@ -129,7 +136,12 @@
         //显示批改界面
         handleCorrect: function (index, row) {
           this.correctFormVisible = true;
-          this.correctForm = Object.assign({}, row);
+          //this.correctForm = Object.assign({}, row);
+          this.correctForm = {
+            content:row.workDetail.publishContent,
+            submit_content:row.submitContent,
+            score:row.score,
+          };
         },
       }
     }
