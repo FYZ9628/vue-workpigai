@@ -94,7 +94,8 @@
                   <el-date-picker
                     v-model="endTimePicker"
                     type="datetime"
-                    placeholder="选择截止时间">
+                    placeholder="选择截止时间"
+                    value-format="yyyy-MM-dd HH:mm:ss">
                   </el-date-picker>
                   <el-button type="primary" style="background-color: #545c64;" @click.native="handlePublish" :loading="listenLoading">发 布</el-button>
 
@@ -240,6 +241,9 @@
           // console.log(tempWork.teacherId);
           // console.log(tempWork.classId);
           // console.log(tempWork.endTime);
+
+
+
 
 
           this.$confirm('确认发布?', '提示', {
