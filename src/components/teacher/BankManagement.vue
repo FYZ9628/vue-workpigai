@@ -306,6 +306,10 @@
                   }
                   if (resp && resp.status === 200) {
                     // if (resp.data!=null) {
+                    this.$message({
+                      message: '编辑成功',
+                      type: 'success'
+                    });
                     this.listenLoading = false;
                     this.editFormVisible = false;
                     this.loadBankInfo();
@@ -320,6 +324,7 @@
           }
         });
       },
+
       //删除
       deleteQuestion: function (index, row) {
         this.$confirm('确认删除该记录吗?', '提示', {

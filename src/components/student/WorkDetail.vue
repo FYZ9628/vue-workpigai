@@ -34,7 +34,7 @@
     </el-main>
   <el-footer>
     <el-footer style="padding-right: 100px;text-align:right;">
-      <el-button type="primary" style="background-color: #545c64;" v-on:click="getUsers">提 交</el-button>
+      <el-button type="primary" style="background-color: #545c64;" v-on:click="workSubmit">提 交</el-button>
     </el-footer>
   </el-footer>
   </el-container>
@@ -48,17 +48,57 @@
           input: '',
           questionTextarea:'',
           submitContent:'',
-
           // 详情界面接收作业列表传过来的数据
-          workData:this.$route.query.data
+          workData:this.$route.query.data,
+          workId:this.$route.query.data.id,
+          listenLoading: false,
         }
       },
-
+      // mounted，组件挂载后，此方法执行后，页面显示
+      mounted: function () {
+        this.judgeState();
+      },
       methods: {
         goBack() {
           window.history.back()
           console.log('go back');
-        }
+        },
+
+        judgeState(){
+          if (this.$route.query.data.state=="已提交"){
+            this.submitContent=this.$route.query.data.submitContent
+          }
+        },
+        //提交作业
+        workSubmit: function () {
+              this.$confirm('确认提交吗？', '提示', {}).then(() => {
+                this.listenLoading = true;
+                this.$axios
+                  .post('/submitAnswer', {
+                    workId:this.workId,
+                    submitContent:this.submitContent,
+                  }).then(resp => {
+                  if (resp.data == ''){
+                    this.$message({
+                      message: '提交失败',
+                      type: 'failure'
+                    });
+                    this.listenLoading = false;
+
+                  }
+                  if (resp.data!=null) {
+                    this.$message({
+                      message: '提交成功',
+                      type: 'success'
+                    });
+                    this.listenLoading = false;
+                    //this.loadWorkInfo();
+                    this.$emit('onSubmit')
+                  }
+
+                })
+              });
+        },
       }
     }
 

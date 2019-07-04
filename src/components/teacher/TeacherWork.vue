@@ -111,6 +111,7 @@
         processData:{
           process:'25'
         },
+        listenLoading: false,
       }
     },
 
@@ -188,21 +189,34 @@
         this.$confirm('确认删除该记录吗?', '提示', {
           type: 'warning'
         }).then(() => {
-          this.listLoading = true;
-          //NProgress.start();
-          let para = { id: row.id };
-          removeUser(para).then((res) => {
-            this.listLoading = false;
-            //NProgress.done();
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            });
-            this.getUsers();
-          });
-        }).catch(() => {
-
-        });
+            this.listenLoading = true;
+            this.$axios     //{id: row.id}
+              .post('/deleteWork', {
+                  workDetailId: row.workDetail.id,
+                  teacherId:row.teacher.id,
+              }).then(resp => {
+              if (resp && resp.data.code === 100) {
+                this.listenLoading = false;
+                this.$message({
+                  message: '删除成功',
+                  type: 'success'
+                });
+                this.loadWorkInfo()
+              }else {
+                this.$message({
+                  message: '删除失败',
+                  type: 'failure'
+                });
+                this.listenLoading = false;
+              }
+            })
+          }
+        ).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       },
     }
   }

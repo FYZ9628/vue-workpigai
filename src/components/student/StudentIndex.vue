@@ -112,7 +112,7 @@
               :readonly="true"
               :autosize="{ minRows: 8,maxRows:10}"></el-input>
           </el-form-item>
-          <el-form-item label="答案">
+          <el-form-item label="参考答案">
             <el-input
               type="textarea"
               v-model="checkForm.answer"
