@@ -60,14 +60,17 @@
               .then(successResponse => {
                       this.logining = false
                       if (successResponse.data.code === 200) {//跳转到教师
-                        var data = this.loginForm
-                        _this.$store.commit('login', _this.loginForm)
+
+                         this.$store.commit('login',successResponse.data);
+                        //_this.$store.commit('login', _this.loginForm)
                         var path = this.$route.query.redirect
 
                         this.$router.replace({path: path === '/' || path === undefined ? '/teacher' : path})
                       }else  if (successResponse.data.code === 300) {//跳转到学生
-                        var data = this.loginForm
-                        _this.$store.commit('login', _this.loginForm)
+
+
+                         this.$store.commit('login',successResponse.data);
+                        //_this.$store.commit('login', _this.loginForm)
                         var path = this.$route.query.redirect
 
                         this.$router.replace({path: path === '/' || path === undefined ? '/student' : path})

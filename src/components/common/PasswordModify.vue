@@ -2,7 +2,7 @@
 
   <body >
   <el-row style="z-index: 1;">
-    <CommonHeader style="position: absolute;width: 100%;"></CommonHeader>
+    <PasswordModifyHeader style="position: absolute;width: 100%;"></PasswordModifyHeader>
   </el-row>
   <el-form :model="passwordModifyForm" :rules="rules2" ref="loginForm" class="login-container" label-position="left"
            label-width="0px">
@@ -17,7 +17,7 @@
     </el-form-item>
     <el-form-item prop="passwordAgain">
       <el-input type="password" v-model="passwordModifyForm.passwordAgain"
-                auto-complete="off" placeholder="密码" v-on:keyup.enter.native="login"></el-input>
+                auto-complete="off" placeholder="再次输入密码" v-on:keyup.enter.native="login"></el-input>
     </el-form-item>
 
     <el-form-item style="width: 100%">
@@ -29,18 +29,18 @@
 </template>
 
 <script>
-  import CommonHeader from './CommonHeader'
+  import PasswordModifyHeader from './PasswordModifyHeader'
 
   export default {
     name: 'PasswordModify',
-    components: {CommonHeader},
+    components: {PasswordModifyHeader},
     data () {
       return {
         modifying: false,
         passwordModifyForm: {
-          account: '116263000101',
-          password: '123456',
-          passwordAgain:'123456'
+          // account: $store.getters.account(),
+          // password: '123456',
+          // passwordAgain:'123456'
         },
         rules2: {
           account: [
@@ -70,7 +70,7 @@
   }
   .login-container {
     border-radius: 15px;
-    background-clip: padding-box;
+    /*background-clip: padding-box;*/
     margin: 90px auto;
     width: 350px;
     padding: 35px 35px 15px 35px;
@@ -84,8 +84,6 @@
     color: #505458;
   }
 
-  .remember {
-    margin: 0px 0px 35px 0px;
-  }
+
 
 </style>

@@ -29,7 +29,7 @@
         <el-table
           :data="students"
           style="width: 100%"
-          height="445">
+          height="400">
           <el-table-column
             fixed
             prop="id"
@@ -344,7 +344,7 @@
               // this.user.id = 88; id是自增的，所以当没有的时候就会默认地往后排序号
               this.user.account = this.addForm.account;
               this.user.password = this.addForm.password;
-              this.user.type = 1;
+              this.user.type = 3;
 
 
               this.mClass.id=this.returnData.classId;
@@ -435,7 +435,7 @@
               this.user.id =this.editForm.userId;
               this.user.account = this.editForm.account;
               this.user.password = this.editForm.password;
-              this.user.type = 1;
+              this.user.type = 3;
 
 
               this.mClass.id=this.returnData.classId;

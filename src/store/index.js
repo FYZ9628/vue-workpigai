@@ -6,15 +6,37 @@ Vue.use(Vuex)
 // 用于存储登录过的用户的信息
 export default new Vuex.Store({
   state: {
-    user: {
-      account: window.localStorage.getItem('user' || '[]') == null ? ''
-        : JSON.parse(window.localStorage.getItem('user' || '[]')).account
-    }
+    account:''||localStorage.getItem('account'),
+    password:''||localStorage.getItem('password'),
+    name:''||localStorage.getItem('name')
   },
   mutations: {
     login (state, user) {
-      state.user = user
-      window.localStorage.setItem('user', JSON.stringify(user))
+
+      state.account=user.account
+      localStorage.setItem('account',user.account)
+
+      state.password=user.password
+      localStorage.setItem('password',user.password)
+      if(user.name==null){
+        state.name=user.name
+        localStorage.setItem('name','管理员')
+      }else{
+        state.name=user.name
+        localStorage.setItem('name',user.name)
+      }
+
+    },
+    logout(state){
+      localStorage.clear()
+      state.account=null
+      state.password=null
+      state.name=null
     }
+  },
+  getters : {
+    account: (state) => state.account,
+    password:(state) => state.password,
+    name:(state) => state.name
   }
 })
