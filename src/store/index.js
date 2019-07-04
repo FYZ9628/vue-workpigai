@@ -18,6 +18,7 @@ export default new Vuex.Store({
 
       state.password=user.password
       localStorage.setItem('password',user.password)
+
       if(user.name==null){
         state.name=user.name
         localStorage.setItem('name','管理员')

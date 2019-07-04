@@ -110,6 +110,7 @@
         name: "WorkPublish",
       data() {
         return {
+          account:localStorage.getItem("account"),
           workTitle: '',
           questionTextarea: '',//题目文本
           answerTextarea: '',//答案文本

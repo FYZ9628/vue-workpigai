@@ -137,7 +137,7 @@
     data() {
       return {
         input: '',
-
+        account:localStorage.getItem("account"),
         works: [],
         keywords: '',
         searchResult: [],
@@ -171,6 +171,11 @@
     // mounted，组件挂载后，此方法执行后，页面显示
     mounted: function () {
       this.loadWorkInfo();
+      console.log("测试"+account)
+      console.log("测试"+account)
+      console.log("测试"+account)
+      console.log("测试"+account)
+      console.log("测试"+account)
     },
 
     methods: {
