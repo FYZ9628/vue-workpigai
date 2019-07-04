@@ -133,11 +133,22 @@
       //请求加载作业信息
       loadWorkInfo () {
         let _this = this
-        this.$axios.get('/workInfo').then(resp => {
+        // this.$axios.get('/workInfo').then(resp => {
+        //   if (resp && resp.status === 200) {
+        //     _this.works = resp.data;
+        //   }
+        // });
+
+        this.$axios
+          .post('/getTeacherPersonalWork', {
+            keywords: this.account
+          }).then(resp => {
           if (resp && resp.status === 200) {
             _this.works = resp.data;
+
           }
         })
+
       },
 
       //查询
