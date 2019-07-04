@@ -29,7 +29,7 @@
           <el-table
             :data="classs"
             style="width: 100%"
-            height="450">
+            height="400">
             <el-table-column
               fixed
               prop="id"

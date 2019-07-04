@@ -13,7 +13,7 @@
     background-color="#545c64"
     text-color="#fff"
     active-text-color="#ffd04b"
-    style="min-width: 1300px"
+    style="min-width: 1300px;min-height: 50px"
 
   >
     <el-menu-item v-for="(item,i) in navList" :key="i" :index="item.name">

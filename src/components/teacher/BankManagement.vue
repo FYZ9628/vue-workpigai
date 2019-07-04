@@ -28,7 +28,7 @@
         <el-table
           :data="banks"
           style="width: 100%"
-          height="450">
+          height="400">
           <el-table-column
             fixed
             prop="id"

@@ -25,7 +25,7 @@
         <el-table
           :data="works"
           style="width: 100%"
-          height="450">
+          height="400">
           <el-table-column
             fixed
             prop="id"
@@ -62,7 +62,6 @@
             <template slot-scope="scope">
               <el-button
                 size="small"
-
                 @click.native="handleDetail(scope.$index, scope.row)">详情</el-button>
               <el-button
                 size="small"

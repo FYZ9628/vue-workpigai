@@ -42,8 +42,8 @@
           })
           .then(successResponse => {
             if (successResponse.data.code === 100) {
-              // var data = this.loginForm
-              _this.$store.commit('admin_login', _this.loginForm)
+
+              this.$store.commit('login',successResponse.data);
               var path = this.$route.query.redirect
               this.$router.replace({path: path === '/' || path === undefined ? '/admin' : path})
             }
