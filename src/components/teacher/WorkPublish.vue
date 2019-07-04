@@ -112,6 +112,7 @@
       data() {
         return {
           account:localStorage.getItem("account"),
+          teacherId: '',
           workTitle: '',
           questionTextarea: '',//题目文本
           answerTextarea: '',//答案文本
@@ -157,6 +158,12 @@
             }
           });
 
+          this.$axios.get('/questionBankInfo').then(resp => {
+            if (resp && resp.status === 200) {
+              _this.questionBanks = resp.data;
+            }
+          });
+
 
           //请求加载班级信息
           this.$axios.get('/classInfo').then(resp => {
@@ -181,6 +188,18 @@
           });
 
 
+          let user2 ={
+            account: this.account
+          };
+          this.$axios
+            .post('/getTeacher', {
+              user: user2
+            }).then(resp => {
+            if (resp && resp.status === 200) {
+              _this.teacherId = resp.data.id;
+            }
+          })
+
         },
 
 
@@ -200,18 +219,9 @@
                 x += 1;
                 this.worksDetail.publishContent += x + " 、 " +this.questionBanks[i].content +"\n\n";
                 this.worksDetail.answer += x + " 、 " +this.questionBanks[i].answer +"\n\n";
-
               }
             }
-
           }
-
-          // this.worksDetail.workTitle = this.workTitle;
-
-          console.log("测试测试");
-          console.log("测试测试");
-          console.log("测试测试\n"+this.worksDetail.publishContent);
-          console.log("测试测试\n"+this.worksDetail.answer);
 
         },
 
@@ -221,43 +231,18 @@
 
           this.handleWork();
 
-          // let tempWork = {
-          //   id: '',
-          //   worksDetailId: '',
-          //   worksDetailWorkTitle: this.workTitle,
-          //   worksDetailPublishContent: this.worksDetail.publishContent,
-          //   worksDetailAnswer: this.worksDetail.answer,
-          //   teacherId: 7,
-          //   classId: this.classOptionsValue,
-          //   endTime: this.endTimePicker
-          // };
-          //
-          // console.log("发布测试");
-          // console.log(tempWork.id);
-          // console.log(tempWork.worksDetailId);
-          // console.log(tempWork.worksDetailWorkTitle);
-          // console.log(tempWork.worksDetailPublishContent);
-          // console.log(tempWork.worksDetailAnswer);
-          // console.log(tempWork.teacherId);
-          // console.log(tempWork.classId);
-          // console.log(tempWork.endTime);
-
-
-
-
-
           this.$confirm('确认发布?', '提示', {
             type: 'warning'
           }).then(() => {
               this.listenLoading = true;
               this.$axios
                 .post('/publishWork', {
-                  id: 99,
-                  worksDetailId: 99,
+                  id: '',
+                  worksDetailId: '',
                   worksDetailWorkTitle: this.workTitle,
                   worksDetailPublishContent: this.worksDetail.publishContent,
                   worksDetailAnswer: this.worksDetail.answer,
-                  teacherId: 7,
+                  teacherId: this.teacherId,
                   classId: this.classOptionsValue,
                   endTime: this.endTimePicker
                   }).then(resp => {
@@ -268,6 +253,10 @@
                     type: 'success'
                   });
                   this.loadBankInfo();
+                  this.workTitle = '';
+                  this.classOptionsValue = '';
+                  this.endTimePicker = '';
+
                 }else {
                   this.$message({
                     message: '该班级没有学生，发布失败',
