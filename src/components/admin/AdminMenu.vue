@@ -6,7 +6,7 @@
 
 <template>
   <el-menu class="nav-menu"
-    :default-active="'/teacherInfo'"
+           router :default-active="$route.path"
     router
     mode="horizontal"
 
@@ -16,7 +16,8 @@
     style="min-width: 1300px;min-height: 50px"
 
   >
-    <el-menu-item v-for="(item,i) in navList" :key="i" :index="item.name">
+    <el-menu-item v-for="(item,i) in navList" :key="i" :index="item.name"
+    >
       {{ item.navItem }}
     </el-menu-item>
 
@@ -26,7 +27,7 @@
 
 <script>
   export default {
-    name: 'NavMenu',
+    name: 'AdminMenu',
     data () {
       return {
         navList: [
@@ -37,6 +38,7 @@
         ]
       }
     },
+
     // methods:{
     //   handleSelect(key,keypath){
     //     if (key==='/teacherInfo') {this.$router.push('/teacherInfo')

@@ -6,7 +6,7 @@
 
 <template>
   <el-menu class="nav-menu"
-    :default-active="'/teacherWork'"
+           router :default-active="$route.path"
     router
     mode="horizontal"
 

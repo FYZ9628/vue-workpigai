@@ -4,7 +4,7 @@
       <CommonHeader style="position: absolute;width: 100%;"></CommonHeader>
     </el-row>
     <el-row style="z-index: 0;">
-      <nav-menu></nav-menu>
+      <AdminMenu></AdminMenu>
       <router-view/>
     </el-row>
   </div>
@@ -12,12 +12,12 @@
 </template>
 
 <script>
-  import NavMenu from './admin/NavMenu'
+  import AdminMenu from './admin/AdminMenu'
   import CommonHeader from './common/CommonHeader'
 
   export default {
     name: 'AdminHome',
-    components: {CommonHeader,NavMenu}
+    components: {CommonHeader,AdminMenu}
   }
 </script>
 
